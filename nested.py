@@ -8,7 +8,7 @@ def init(max_epochs=None, learning_rate=None, n_patterns=None, x_pattern_feature
 
 def getDatasets(n_patterns, x_pattern_features):
   def generateDataset():
-    ## -- GENERATE TRAINING SET
+    ## -- GENERATE DATASET
     dataset = np.random.randint(2, size=[n_patterns, x_pattern_features])
     dataset[dataset == 0] = -1  # Rewrite zeros to -1.
     
@@ -75,7 +75,7 @@ def evaluatePerformance(actualTargets, predictedTargets):
     specificity = trueNegatives / (trueNegatives + falsePositives)
   except ZeroDivisionError:
     specificity = 0
-    
+
   return negativeLogLikelihood, accuracy, precision, sensitivity, specificity
 
 def testWeights(testingDataset, weights):

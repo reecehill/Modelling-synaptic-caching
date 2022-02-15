@@ -14,6 +14,8 @@ def getDatasets():
     # -- GENERATE DATASET
     datasetX = np.random.randint(2, size=[N_PATTERNS, X_PATTERN_FEATURES])
     datasetX[datasetX == 0] = -1  # Rewrite zeros to -1.
+    ones = np.ones((N_PATTERNS, 1))
+    datasetX = np.hstack([ones, datasetX])
 
     # Add targets to dataset
     datasetY = np.random.randint(2, size=[N_PATTERNS, 1])
@@ -33,11 +35,25 @@ def predict(pattern, weights):
 
 
 def trainWeights(trainingDatasetX, trainingDatasetY):
-	# weights = [0.0 for i in range(len(dataset[0]))]
-  minWeight = -1
-  maxWeight = 1
-  initialWeights = (maxWeight - minWeight) * \
-      np.random.rand(len(trainingDatasetX[0])) + minWeight
+  #minWeight = -1
+  #maxWeight = 0
+  #initialWeights = (maxWeight - minWeight) * np.random.rand(len(trainingDatasetX[0])) + minWeight
+  #initialWeights = [0.0 for i in range(len(trainingDatasetX[0]))]
+
+  # !-- SET +ve/-ve WEIGHTS TO TRY AND MATCH PROPORTIONS FOUND IN BRAIN
+  #https://www.brainfacts.org/brain-anatomy-and-function/cells-and-circuits/2021/how-inhibitory-neurons-shape-the-brains-code-100621
+  numberOfInhibitoryWeights = int(round(len(trainingDatasetX[0]) * 0.2, 0))
+  initialInhibitoryWeights = np.random.rand(numberOfInhibitoryWeights) * -1
+  initialExcitatoryWeights = np.random.rand(
+      len(trainingDatasetX[0]) - numberOfInhibitoryWeights)
+  initialWeights = np.concatenate((initialExcitatoryWeights, initialInhibitoryWeights))
+  
+  
+  np.random.shuffle(initialWeights)
+  initialWeightSigns = np.sign(initialWeights)
+  excitatoryWeightsIndexes = np.where(initialWeightSigns >= 0)
+  inhibitoryWeightsIndexes = np.where(initialWeightSigns < 0)
+
   weightHistory = np.zeros((MAX_EPOCHS-1, len(initialWeights)))
   weights = np.vstack([initialWeights, weightHistory])
   for epochIndex in range(1, MAX_EPOCHS):
@@ -47,7 +63,24 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       error = trainingDatasetY[patternIndex] - prediction
       sum_error += error**2
       deltaWeights = LEARNING_RATE * (error * pattern)
-      weights[epochIndex] = weights[epochIndex] + deltaWeights
+      
+      # Using their indexes, get excitatory weights and add them to their respective deltaWeights.
+      excitatoryValues = weights[epochIndex, [
+          excitatoryWeightsIndexes]] + deltaWeights[excitatoryWeightsIndexes]
+      
+      # Update the excitatory value history, but prevent excitation->inhibition switch by clipping excitatory values to be minimum of 0 (i.e. off).
+      weights[epochIndex, [excitatoryWeightsIndexes]] = np.clip(
+          a=excitatoryValues, a_min=0, a_max=None)
+
+      # Using their indexes, get inhibitory weights and add them to their respective deltaWeights.
+      inhibitoryValues = weights[epochIndex, [inhibitoryWeightsIndexes]] + \
+          deltaWeights[inhibitoryWeightsIndexes]
+
+      # Update the excitatory value history, but prevent inhibition->excitation switch by clipping inhibitory values to be maximum of 0 (i.e. off).
+      weights[epochIndex, [inhibitoryWeightsIndexes]] = np.clip(
+          a=inhibitoryValues, a_min=None, a_max=0)
+
+    # Set the proceding weight timestep to be equal to that of the current timestep (so predictions are not made from zeros).
     if(epochIndex != MAX_EPOCHS-1):
       weights[epochIndex+1] = weights[epochIndex]
 

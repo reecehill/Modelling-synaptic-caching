@@ -36,21 +36,20 @@ def getInitialWeights(trainingDatasetX):
   return allWeights, indexesOfWeights
 
 
-def getFilteredWeights(epochIndex, weights, filterBy=None):
-  return weights[epochIndex, [filterBy]]
+def getFilteredWeights(weights, filterBy=None):
+  return weights[[filterBy]]
 
 
-def updateWeights(epochIndex, weights, newWeights, indexesOfWeights):
-  for typeOfWeights, indexOfWeights in indexesOfWeights.items():
-    if (typeOfWeights == 'excitatoryWeights'):
-      a_min = 0
-      a_max = None
-    elif(typeOfWeights == 'inhibitoryWeights'):
-      a_min = None
-      a_max = 0
-    else:
-      a_min = 1
-      a_max = 0
-    weights[epochIndex, [indexOfWeights]] = np.clip(
-        a=newWeights[typeOfWeights], a_min=a_min, a_max=a_max)
-  return weights
+def updateWeights(typeOfWeights, newWeights):
+  if (typeOfWeights == 'excitatoryWeights'):
+    a_min = 0
+    a_max = None
+  elif(typeOfWeights == 'inhibitoryWeights'):
+    a_min = None
+    a_max = 0
+  else:
+    a_min = None
+    a_max = None
+
+    #TODO: this code will fail if weights are not defined as excitatory or inhibitory.
+  return np.clip(a=newWeights[typeOfWeights], a_min=a_min, a_max=a_max)

@@ -50,11 +50,8 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       newWeights = dict()
       for typeOfWeights, indexOfWeights in indexesOfWeights.items():
         # Using their indexes, get excitatory and inhibitory weights and add them to their respective deltaWeights.
-        newWeights[typeOfWeights] = w.getFilteredWeights(
-            epochIndex, weights, filterBy=indexOfWeights) + deltaWeights[indexOfWeights]
-
-      weights = w.updateWeights(
-          epochIndex, weights, newWeights, indexesOfWeights)
+        newWeights[typeOfWeights] = w.getFilteredWeights(weights[epochIndex], filterBy=indexOfWeights) + deltaWeights[indexOfWeights]
+        weights[epochIndex, [indexOfWeights]] = w.updateWeights(typeOfWeights, newWeights)
 
     # Set the proceding weight timestep to be equal to that of the current timestep (so predictions are not made from zeros).
     if(epochIndex != env.MAX_EPOCHS-1):

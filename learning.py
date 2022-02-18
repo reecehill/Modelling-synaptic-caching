@@ -32,15 +32,14 @@ def getDatasets():
 
 # Make a prediction with weights
 def predict(pattern, weights):
-  activation = np.dot(weights, pattern)
+  totalWeights = weights[:, 0] + weights[:, 1]
+  activation = np.dot(totalWeights, pattern)
   return [1] if activation >= 0.0 else [0]
 
 # Estimate Perceptron weights using stochastic gradient descent
-
-
 def trainWeights(trainingDatasetX, trainingDatasetY):
   weights, indexesOfWeights = w.getInitialWeights(trainingDatasetX)
-  for epochIndex in range(1, env.MAX_EPOCHS):
+  for epochIndex in range(0, env.MAX_EPOCHS):
     sum_mse = 0.0
     for patternIndex, pattern in enumerate(trainingDatasetX):
       prediction = predict(pattern, weights[epochIndex])

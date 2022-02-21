@@ -1,8 +1,8 @@
 # CONSTANT PARAMETERS
-import numpy
+from numpy import random
 
 
-SEEDS = [0,1,2]
+SEEDS = [0,10,20]
 MAX_EPOCHS = 20
 LEARNING_RATE = 0.1
 N_PATTERNS = 100
@@ -14,7 +14,7 @@ X_PATTERN_FEATURES = 100  # Could be 8200, according to https://pubmed.ncbi.nlm.
 
 ENERGY_EXPONENT = 1
 NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY = True
-NEURONES_CAN_CHANGE_TYPE_MID_SIMULATION = True
+NEURONES_CAN_CHANGE_TYPE_MID_SIMULATION = False
 MEMORY_IS_TRANSIENT_OR_CONSOLIDATED = True
 
 # *-*-*-*-*-*-
@@ -47,8 +47,8 @@ else:
     WEIGHT_NEURONE_TYPES = {
         'excitatory': {
             'name': 'all',
-            'max': -1.0,
-            'min': 1.0,
+            'max': 1.0,
+            'min': -1.0,
             'default': 0,
             'percentage_quantity_of_neurones': 100,
             'cumulative': [],
@@ -70,7 +70,7 @@ def generateWeightModel():
     return WEIGHT_MODEL
 def setSeed(seed):
     global RANDOM_GENERATOR
-    RANDOM_GENERATOR = numpy.random.default_rng(seed)
+    RANDOM_GENERATOR = random.default_rng(seed)
 
 #WEIGHT_MODEL = WEIGHT_NEURONE_TYPES
 N_WEIGHTS = X_PATTERN_FEATURES

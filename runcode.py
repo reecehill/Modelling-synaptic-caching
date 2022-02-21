@@ -4,10 +4,10 @@ import energy as e
 import time
 
 for seed in env.SEEDS:
-    env.setSeed(seed)
-    
     start = time.time()
 
+    env.setSeed(seed)
+    print("Starting...")
     # Generate datasets
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 

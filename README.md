@@ -13,12 +13,12 @@ Memory types: these are sub-units of a given neuronal type. In practice, they co
 
 For example, a tree diagram could be:
 
-[Neuronal types]
---> Excitatory
--->---> [Memory types]
--->---> Consolidated
--->---> Transient
---> Inhibitory
--->---> [Memory types]
--->---> Consolidated
--->---> Transient
+- Neuronal types
+ - Excitatory
+   - [Memory types]
+   - Consolidated
+   - Transient
+ - Inhibitory
+   - [Memory types]
+   - Consolidated
+   - Transient

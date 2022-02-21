@@ -11,14 +11,13 @@ Neuronal types: used to define a neurone as excitatory or inhibitory. In essence
 
 Memory types: these are sub-units of a given neuronal type. In practice, they could describe an increase in vesicular release, or more permanent methods of increasing neurone-neurone connectivity such as increasing the number of synapses. In the paper, it is split into transient (temporary memory, i.e., vesicular release) and consolidated (more permanent) memory.
 
-For example, a tree diagram could be:
+For example, a suitable hierarchy could be:
 
-- Neuronal types
- - Excitatory
-   - [Memory types]
-   - Consolidated
-   - Transient
- - Inhibitory
-   - [Memory types]
-   - Consolidated
-   - Transient
+ - Excitatory neurone
+   - Consolidated memory type
+   - Transient memory type
+ - Inhibitory neurone
+   - Consolidated memory type
+   - Transient memory type
+
+NB: All neurones must have the same memory types.

@@ -1,4 +1,5 @@
 # PBM-Project1
 
 # Instructions
-runcode is the wrapper file that calls functions from nested file.
+1) Set parameters (i.e. seeds, max_epochs) in parameters file.
+2) Run runcode.py

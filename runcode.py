@@ -12,17 +12,19 @@ for seed in env.SEEDS:
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 
     # Use training dataset to estimate weights, where each row of weights is a new epoch.
-    weightsByEpoch = l.trainWeights(trainingDatasetX, trainingDatasetY)
+    weightsByEpoch, consolidationsByEpoch = l.trainWeights(trainingDatasetX, trainingDatasetY)
 
     # Get performance metrics (currently only NLL works)
     negativeLogLikelihood, accuracy, precision, sensitivity, specificity = l.testWeights(
         testingDatasetX, testingDatasetY, weightsByEpoch)
 
     # Calculate metabolic energy required for learning
-    energy = e.calculateMetabolicEnergy(weightsByEpoch)
-
+    metabolicEnergy = e.calculateMetabolicEnergy(weightsByEpoch)
+    energyByConsolidations = e.calculateEnergyFromConsolidations(consolidationsByEpoch)
 
     report = {
+        'Metabolic Energy': str(metabolicEnergy),
+        'Changes in weights through consolidations': str(energyByConsolidations),
         'NLL': str(negativeLogLikelihood)+'%',
         'Accuracy': str(accuracy)+'%',
         'Precision': str(precision)+'%',
@@ -33,4 +35,6 @@ for seed in env.SEEDS:
     timeElapsed=time.time() - start
 
     print("Finished (time elapsed: "+str(timeElapsed))
+    
     print(report)
+print("Done.")

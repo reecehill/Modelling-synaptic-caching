@@ -3,8 +3,8 @@ from numpy import random
 
 
 SEEDS = [0, 10, 20]
-MAX_EPOCHS = 20
-LEARNING_RATE = 0.1
+MAX_EPOCHS = 50
+LEARNING_RATE = 0.2
 N_PATTERNS = 100
 
 # .x_pattern_features = n_patterns
@@ -16,12 +16,12 @@ X_PATTERN_FEATURES = 100
 ENERGY_EXPONENT = 1
 
 # Set simulation parameters according to preset scenarios. Enter an integer, as follows:
-# 1: Use parameters from the paper.
-# 2: Use parameters from the paper, but deactivate (set to zero) any neurone that switch from excitatory/inhibitory.
+# 1: Neurones have behaviour alike that in the paper.
+# 2: Prevent neurones from switching between excitatory/inhibitory (and deactivate them/set to zero if they try)
 PRESET_SIMULATION  = 2
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZE_OF_TRANSIENT_MEMORY = 20
+MAX_SIZE_OF_TRANSIENT_MEMORY = 0.2
 
 
 # *-*-*-*-*-*-
@@ -41,7 +41,7 @@ elif(PRESET_SIMULATION == 2):
 # This dictionary stores the different types of neurones, and is set according to NEURONES_ARE_INHIBITORY_OR_EXCITATORY
 if (NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY):
     WEIGHT_NEURONE_TYPES = {
-        'excitatory': {
+        0: {
             'name': 'excitatory',
             'max': 1.0,
             'min': 0,
@@ -50,7 +50,8 @@ if (NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY):
             'cumulative': [],
             'memoryTypes': {}
         },
-        'inhibitory': {
+        1: {
+            'name': 'inhibitory',
             'max': 0,
             'min': -1.0,
             'default': 0,
@@ -61,7 +62,7 @@ if (NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY):
     }
 else:
     WEIGHT_NEURONE_TYPES = {
-        'all': {
+        0: {
             'name': 'all',
             'max': 1.0,
             'min': -1.0,
@@ -74,15 +75,19 @@ else:
 
 if(MEMORY_IS_TRANSIENT_OR_CONSOLIDATED):
     WEIGHT_MEMORY_TYPES = {
-        'consolidated': {
+        0: {
+            'name': 'consolidated',
             'memory_size': False
-        }, 'transient': {
+        },
+        1: {
+            'name': 'transient',
             'memory_size': MAX_SIZE_OF_TRANSIENT_MEMORY
         }
     }
 else:
     WEIGHT_MEMORY_TYPES = {
-        'consolidated': {
+        0: {
+            'name': 'consolidated',
             'memory_size': False
         }
     }

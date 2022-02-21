@@ -40,8 +40,9 @@ def predict(pattern, weightsAtTimeT):
 
 # Estimate Perceptron weights using stochastic gradient descent
 def trainWeights(trainingDatasetX, trainingDatasetY):
-  weightsByTime, neuronalTypes = w.getInitialWeights(
+  weightsByTime, neuronalTypes = w.prepareWeights(
       trainingDatasetX)
+  consolidationsByTime = w.prepareConsolidationEvents(weightsByTime.shape)
   for epochIndex in range(0, env.MAX_EPOCHS):
     sum_mse = 0.0
     for patternIndex, pattern in enumerate(trainingDatasetX):
@@ -49,17 +50,18 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       error = trainingDatasetY[patternIndex] - prediction
       sum_mse += error**2
 
-      # To-do: for now, only the last weight type is considered by delta weight.
+      # To-do: for now, only the last weight type is added to with delta weight.
       deltaWeights = np.zeros(weightsByTime[epochIndex].shape)
       deltaWeights[:,-1] = env.LEARNING_RATE * (error * pattern)
-      weightsByTime[epochIndex] = w.updateWeights(weightsByTime[epochIndex], deltaWeights, neuronalTypes)
+      weightsByTime[epochIndex], consolidationsByTime[epochIndex] = w.updateWeights(
+          weightsByTime[epochIndex], deltaWeights, neuronalTypes, consolidationsByTime[epochIndex])
 
     # Set the proceding weight timestep to be equal to that of the current timestep (so predictions are not made from zeros).
     if(epochIndex != env.MAX_EPOCHS-1):
       weightsByTime[epochIndex+1] = weightsByTime[epochIndex]
     
     #print('->epochIndex=%d, lrate=%.3f, MSE=%f' %(epochIndex, env.LEARNING_RATE, (sum_mse/len(trainingDatasetX))))
-  return weightsByTime
+  return weightsByTime, consolidationsByTime
 
 
 def testWeights(testingDatasetX, testingDatasetY, weights):

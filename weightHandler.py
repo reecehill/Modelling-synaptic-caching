@@ -78,13 +78,6 @@ def prepareConsolidationEvents(weightsByTimeShape):
     consolidationsByTime = np.zeros(weightsByTimeShape)
     return consolidationsByTime
 
-def updateCumulativeWeights(weights):
-    for neuroneTypeName, neuroneTypeData in weights.items():
-        for memoryTypeName, memoryTypeData in neuroneTypeData['items'].items():
-            weights[neuroneTypeName]['cumulative'] += memoryTypeData
-    return weights
-
-
 def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
     # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
     for memoryTypeId in sorted(env.WEIGHT_MEMORY_TYPES, reverse=True):
@@ -94,7 +87,7 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
 
         # Get the indexes of weights that have exceeded their memory limit.
         indexesOfWeightsAboveThreshold = np.where(
-            newWeightsAtTimeT[:, memoryTypeId] >= env.WEIGHT_MEMORY_TYPES[memoryTypeId]['memory_size'])[0]
+            abs(newWeightsAtTimeT[:, memoryTypeId]) >= abs(env.WEIGHT_MEMORY_TYPES[memoryTypeId]['memory_size']))[0]
         
         if(len(indexesOfWeightsAboveThreshold) > 0):
             # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)

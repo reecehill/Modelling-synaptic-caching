@@ -2,6 +2,7 @@ import parameters as env
 import learning as l
 import energy as e
 import time
+from json import dumps
 
 for seed in env.SEEDS:
     start = time.time()
@@ -12,29 +13,51 @@ for seed in env.SEEDS:
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 
     # Use training dataset to estimate weights, where each row of weights is a new epoch.
-    weightsByEpoch, consolidationsByEpoch = l.trainWeights(trainingDatasetX, trainingDatasetY)
+    completedBeforeLastEpoch, weightsByEpoch, consolidationsByEpoch = l.trainWeights(trainingDatasetX, trainingDatasetY)
 
-    # Get performance metrics (currently only NLL works)
-    negativeLogLikelihood, accuracy, precision, sensitivity, specificity = l.testWeights(
+    # Get performance metrics for seen data
+    trainNLL, trainAccuracy, trainPrecision, trainSensitivity, trainSpecificity = l.testWeights(
+        trainingDatasetX, trainingDatasetY, weightsByEpoch)
+    # Get performance metrics for UNSEEN data
+    testNLL, testAccuracy, testPrecision, testSensitivity, testSpecificity = l.testWeights(
         testingDatasetX, testingDatasetY, weightsByEpoch)
 
     # Calculate metabolic energy required for learning
+    theoreticalMinimumEnergy = e.calculateTheoreticalMinimumEnergy(weightsByEpoch)
     metabolicEnergy = e.calculateMetabolicEnergy(weightsByEpoch)
-    energyByConsolidations = e.calculateEnergyFromConsolidations(consolidationsByEpoch)
+    maintenanceEnergy = e.calculateEnergyFromMaintenance(weightsByEpoch)
+    consolidationEnergy = e.calculateEnergyFromConsolidations(
+        consolidationsByEpoch)
+
 
     report = {
+        'Was learning complete?': completedBeforeLastEpoch,
+        'Theoretical Minimum Energy': str(theoreticalMinimumEnergy),
         'Metabolic Energy': str(metabolicEnergy),
-        'Changes in weights through consolidations': str(energyByConsolidations),
-        'NLL': str(negativeLogLikelihood)+'%',
-        'Accuracy': str(accuracy)+'%',
-        'Precision': str(precision)+'%',
-        'Sensitivity': str(sensitivity)+'%',
-        'Specificity': str(specificity)+'%'
+        'Energy expended for...': {
+            'consolidations': str(consolidationEnergy),
+            'maintenance': str(maintenanceEnergy),
+        },
+        'Seen data...': {
+            'NLL': str(trainNLL)+'%',
+            'Accuracy': str(trainAccuracy)+'%',
+            'Precision': str(trainPrecision)+'%',
+            'Sensitivity': str(trainSensitivity)+'%',
+            'Specificity': str(trainSpecificity)+'%',
+        },
+        'Unseen data...': {
+            'NLL': str(testNLL)+'%',
+            'Accuracy': str(testAccuracy)+'%',
+            'Precision': str(testPrecision)+'%',
+            'Sensitivity': str(testSensitivity)+'%',
+            'Specificity': str(testSpecificity)+'%'
+        },
+
     }
 
     timeElapsed=time.time() - start
 
     print("Finished (time elapsed: "+str(timeElapsed))
     
-    print(report)
+    print(dumps(report, indent=4))
 print("Done.")

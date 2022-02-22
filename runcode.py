@@ -13,7 +13,8 @@ for seed in env.SEEDS:
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 
     # Use training dataset to estimate weights, where each row of weights is a new epoch.
-    completedBeforeLastEpoch, weightsByEpoch, consolidationsByEpoch = l.trainWeights(trainingDatasetX, trainingDatasetY)
+    epochIndexForConvergence, weightsByEpoch, consolidationsByEpoch = l.trainWeights(
+        trainingDatasetX, trainingDatasetY)
 
     # Get performance metrics for seen data
     trainNLL, trainAccuracy, trainPrecision, trainSensitivity, trainSpecificity = l.testWeights(
@@ -31,7 +32,7 @@ for seed in env.SEEDS:
 
 
     report = {
-        'Learning was complete at epoch #': completedBeforeLastEpoch,
+        'Learning was complete at epoch #': epochIndexForConvergence,
         'Theoretical Minimum Energy': str(theoreticalMinimumEnergy),
         'Metabolic Energy': str(metabolicEnergy),
         'Energy expended for...': {

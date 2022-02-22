@@ -43,15 +43,15 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
   weightsByTime, neuronalTypes = w.prepareWeights(
       trainingDatasetX)
   consolidationsByTime = w.prepareConsolidationEvents(weightsByTime.shape)
-  completedBeforeLastEpoch = False
+  epochIndexForConvergence = False
   for epochIndex in range(0, env.MAX_EPOCHS):
-    if(completedBeforeLastEpoch != False):
+    if(epochIndexForConvergence != False):
       break #Correct weights have been found. No need to keep learning.
     sum_mse = 0.0
     for patternIndex, pattern in enumerate(trainingDatasetX):
       prediction = predict(pattern, weightsByTime[epochIndex])
       error = trainingDatasetY[patternIndex] - prediction
-      sum_mse += error**2
+      sum_mse += (error**2)
 
       # TODO: for now, only the most transient weight type is added to with delta weight.
       deltaWeights = np.zeros(weightsByTime[epochIndex].shape)
@@ -64,9 +64,9 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       weightsByTime[epochIndex+1] = weightsByTime[epochIndex]
     if(sum_mse == 0.0):
       # No weights were changed this epoch. Therefore, assume learning is complete.
-      completedBeforeLastEpoch = epochIndex
+      epochIndexForConvergence = epochIndex
     print('->epochIndex=%d, lrate=%.3f, MSE=%f' %(epochIndex, env.LEARNING_RATE, (sum_mse/len(trainingDatasetX))))
-  return completedBeforeLastEpoch, weightsByTime, consolidationsByTime
+  return epochIndexForConvergence, weightsByTime, consolidationsByTime
 
 
 def testWeights(testingDatasetX, testingDatasetY, weights):

@@ -45,7 +45,7 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
   consolidationsByTime = w.prepareConsolidationEvents(weightsByTime.shape)
   completedBeforeLastEpoch = False
   for epochIndex in range(0, env.MAX_EPOCHS):
-    if(completedBeforeLastEpoch):
+    if(completedBeforeLastEpoch != False):
       break #Correct weights have been found. No need to keep learning.
     sum_mse = 0.0
     for patternIndex, pattern in enumerate(trainingDatasetX):
@@ -64,7 +64,7 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       weightsByTime[epochIndex+1] = weightsByTime[epochIndex]
     if(sum_mse == 0.0):
       # No weights were changed this epoch. Therefore, assume learning is complete.
-      completedBeforeLastEpoch = True
+      completedBeforeLastEpoch = epochIndex
     print('->epochIndex=%d, lrate=%.3f, MSE=%f' %(epochIndex, env.LEARNING_RATE, (sum_mse/len(trainingDatasetX))))
   return completedBeforeLastEpoch, weightsByTime, consolidationsByTime
 

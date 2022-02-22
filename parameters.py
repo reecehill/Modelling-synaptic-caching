@@ -4,14 +4,14 @@ from numpy import random
 
 SEEDS = [0]
 MAX_EPOCHS = 1000 # Max epochs before concluding convergence is not possible
-LEARNING_RATE = 0.02
-N_PATTERNS = 300
+LEARNING_RATE = 0.1
+N_PATTERNS = 200
 
 # .x_pattern_features = n_patterns
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = 300
+X_PATTERN_FEATURES = 200
 
 ENERGY_EXPONENT = 1
 

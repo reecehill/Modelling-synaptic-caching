@@ -31,7 +31,7 @@ for seed in env.SEEDS:
 
 
     report = {
-        'Was learning complete?': completedBeforeLastEpoch,
+        'Learning was complete at epoch #': completedBeforeLastEpoch,
         'Theoretical Minimum Energy': str(theoreticalMinimumEnergy),
         'Metabolic Energy': str(metabolicEnergy),
         'Energy expended for...': {

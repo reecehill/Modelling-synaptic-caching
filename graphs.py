@@ -15,8 +15,8 @@ def makeFigure1c(directoryName):
     plt.plot(x, y, color="red",  linewidth=2.5, linestyle="-")
     plt.yscale('log')
     # Setting the boundaries of the figure
-    plt.xlim(x.min()*1, x.max()*1)
-    plt.ylim(y.min()*1, y.max()*1)
+    plt.xlim(0, 2)
+    plt.ylim(10**3, 10**9)
     plt.xlabel('number of patterns / number of synapses')  # add x-label
     plt.ylabel('energy used (a.u.)')  # add y-label
     fig.savefig(directoryName+"/figure1c.png", dpi=300)  # save figure

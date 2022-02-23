@@ -26,7 +26,7 @@ def calculateTheoreticalEfficiency():
   m_minimum = ((2/np.pi)**(1/2))*env.LEARNING_RATE*(K**(1/2))
   try:
     value = m_perceptron / m_minimum
-  except:
+  except :
     value = 0
   return round(value, 3)
 

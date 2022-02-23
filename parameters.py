@@ -3,15 +3,17 @@ from numpy import random
 
 
 SEEDS = [0]
-MAX_EPOCHS = 500  # Max epochs before concluding convergence is not possible
-LEARNING_RATE = 0.1
-N_PATTERNS = 250
-
-# .x_pattern_features = n_patterns
-
+LEARNING_RATES = [0.1]
+N_PATTERNS = list(range(100,200))
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = 250
+X_PATTERN_FEATURES = list(range(100, 200))
+ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
+
+MAX_EPOCHS = 500  # Max epochs before concluding convergence is not possible
+# .X_PATTERN_FEATURE = N_PATTERN
+
+
 
 ENERGY_EXPONENT = 1
 
@@ -111,7 +113,21 @@ def setSeed(seed):
     RANDOM_GENERATOR = random.default_rng(seed)
 
 
-#WEIGHT_MODEL = WEIGHT_NEURONE_TYPES
-N_WEIGHTS = X_PATTERN_FEATURES
+def setLearningRate(learningRate):
+    global LEARNING_RATE
+    LEARNING_RATE = learningRate
+
+
+def setNPattern(nPattern):
+    global N_PATTERN
+    N_PATTERN = nPattern
+
+def setXPatternFeature(xPatternFeature):
+    global X_PATTERN_FEATURE
+    global N_WEIGHTS
+    X_PATTERN_FEATURE = xPatternFeature
+
+    #WEIGHT_MODEL = WEIGHT_NEURONE_TYPES
+    N_WEIGHTS = X_PATTERN_FEATURE
 
 WEIGHT_MODEL = generateWeightModel()

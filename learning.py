@@ -7,8 +7,8 @@ def validateParameters():
   w.validateParameters()
   global MAX_EPOCHS
   global LEARNING_RATE
-  global N_PATTERNS
-  global X_PATTERN_FEATURES
+  global N_PATTERN
+  global X_PATTERN_FEATURE
   print("Skipped validation of parameters (learning)...")
 
 
@@ -16,15 +16,15 @@ def getDatasets():
   def generateDataset():
     # -- GENERATE DATASET
     datasetX = env.RANDOM_GENERATOR.integers(
-        2, size=(env.N_PATTERNS, env.X_PATTERN_FEATURES))
+        2, size=(env.N_PATTERN, env.X_PATTERN_FEATURE))
     datasetX[datasetX == 0] = -1  # Rewrite zeros to -1.
     
     # TO-DO: Should we add ones to our dataset? If so, how do we handle the shape difference between weights and features?
-    #ones = np.ones((env.N_PATTERNS, 1))
+    #ones = np.ones((env.N_PATTERN, 1))
     #datasetX = np.hstack([ones, datasetX])
 
     # Add targets to dataset
-    datasetY = env.RANDOM_GENERATOR.integers(2, size=(env.N_PATTERNS, 1))
+    datasetY = env.RANDOM_GENERATOR.integers(2, size=(env.N_PATTERN, 1))
     return datasetX, datasetY
     
   trainingDatasetX, trainingDatasetY = generateDataset()

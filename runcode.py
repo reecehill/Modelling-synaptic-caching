@@ -1,33 +1,55 @@
 import parameters as env
 import learning as l
 import energy as e
+import graphs as g
 import time
 from json import dumps
 from pandas import DataFrame
 from os import path, mkdir
 from datetime import datetime
-
+import numpy as np
 
 # -- PREPARE DIRECTORY FOR OUTPUT
 directoryName = datetime.now().strftime("%Y%m%d-%H%M%S")
 mkdir(directoryName)
 filePath = directoryName+'/output.csv'
+
+
+# Calculate number of possibilities so that total number of simulations can be printed.
+nXPatternFeaturesAboveNPatterns = 0
+for xPatternFeature in env.X_PATTERN_FEATURES:
+    n = [x for x in env.N_PATTERNS if (
+        (x != xPatternFeature) & env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES) or env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES == False]
+    nXPatternFeaturesAboveNPatterns += len(n)
+
+# Prepare and print total number of simulations
 simulationNumber = 0
+totalSimulations = nXPatternFeaturesAboveNPatterns * \
+    len(env.LEARNING_RATES) * len(env.SEEDS)
+print("Simulation "+str(simulationNumber)+" of "+str(totalSimulations))
+
+# Loop through all possible global settings.
+simulationTypeNumber = 0  # Allows for averaging of seeds
 for xPatternFeature in env.X_PATTERN_FEATURES:
     env.setXPatternFeature(xPatternFeature)
-    print("xPattern = "+str(xPatternFeature))
+    if(env.VERBOSE):
+        print("xPattern = "+str(xPatternFeature))
     for nPattern in env.N_PATTERNS:
         if(((nPattern != xPatternFeature) & env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES)
-        or env.X_PATTERN_FEATURE < nPattern): # Avoid dividing by zero error by ensuring <
+           ):  # Avoid dividing by zero error by ensuring <
             continue
         env.setNPattern(nPattern)
-        print("nPattern = "+str(nPattern))
+        if(env.VERBOSE):
+            print("nPattern = "+str(nPattern))
         for learningRate in env.LEARNING_RATES:
             env.setLearningRate(learningRate)
-            print("learningRate = "+str(learningRate))
+            if(env.VERBOSE):
+                print("learningRate = "+str(learningRate))
+            simulationTypeNumber += 1
             for seed in env.SEEDS:
                 env.setSeed(seed)
-                print("seed = "+str(seed))
+                if(env.VERBOSE):
+                    print("seed = "+str(seed))
                 start = time.time()
                 # Generate datasets
                 trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
@@ -59,6 +81,7 @@ for xPatternFeature in env.X_PATTERN_FEATURES:
                     simulationNumber:
                     {
                         'time_elapsed': str(time.time() - start),
+                        'simulationTypeNumber': simulationTypeNumber,
                         'seed': seed,
                         'learning_rate': learningRate,
                         'n_pattern': nPattern,
@@ -101,7 +124,13 @@ for xPatternFeature in env.X_PATTERN_FEATURES:
                 DataFrame.from_dict(report).transpose().to_csv(
                     filePath, header=header, columns=columns, mode=mode)
                 simulationNumber = simulationNumber + 1
+                print("Simulation "+str(simulationNumber) +
+                      " of "+str(totalSimulations))
+
 
 timeElapsed = time.time() - start
-print("Finished (time elapsed: "+str(timeElapsed))
+print("Finished simulation (time elapsed: "+str(timeElapsed))
 print("A csv file has been produced and is available at: (location of this script)/"+str(filePath))
+print("Now producing graphs...")
+
+g.makeFigure1c(directoryName)

@@ -13,7 +13,7 @@ def makeFigure1c(directoryName):
     # Setting the figure size and resolution
     fig = plt.figure(figsize=(10, 6), dpi=300)
     plt.plot(x, y, color="red",  linewidth=2.5, linestyle="-")
-
+    plt.yscale('log')
     # Setting the boundaries of the figure
     plt.xlim(x.min()*1, x.max()*1)
     plt.ylim(y.min()*1, y.max()*1)

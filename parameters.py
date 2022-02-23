@@ -2,12 +2,12 @@
 from numpy import random
 
 
-SEEDS = [0, 1, 2, 3, 4]
+SEEDS = [0, 1]
 LEARNING_RATES = [0.1]
-N_PATTERNS = list(range(1, 400))
+N_PATTERNS = list(range(1, 100))
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [200]
+X_PATTERN_FEATURES = [50]
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 
 MAX_EPOCHS = 500  # Max epochs before concluding convergence is not possible

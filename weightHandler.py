@@ -38,10 +38,12 @@ def prepareWeights(trainingDatasetX):
     for neuroneTypeName, neuroneTypeData in env.WEIGHT_MODEL.items():
         nWeights = int(round(
             (neuroneTypeData['percentage_quantity_of_neurones']/100) * env.N_WEIGHTS, 0))
-        randomWeights = env.RANDOM_GENERATOR.uniform(
-            low=float(neuroneTypeData['min']),
-            high=float(neuroneTypeData['max']),
-            size=nWeights).reshape(nWeights, 1)
+        if(env.WEIGHTS_BEGIN_AT_ZERO == True):
+            randomWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
+        else:
+            randomWeights = env.RANDOM_GENERATOR.uniform(low=float(neuroneTypeData['min']), high=float(
+                neuroneTypeData['max']), size=nWeights).reshape(nWeights, 1)
+
         zeroWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
         initialWeightsToAdd = np.hstack((randomWeights, zeroWeights))
         initialWeights = np.append(initialWeights, initialWeightsToAdd, axis=0)
@@ -49,7 +51,7 @@ def prepareWeights(trainingDatasetX):
     # Due to rounding of nWeights, the matrix may be of incorrect shape. Remove/add row(s) to suit.
     sizeDifference = len(initialWeights) - (env.N_WEIGHTS)
     if(sizeDifference > 0):
-    # Matrix is too large, so remove last rows.
+        # Matrix is too large, so remove last rows.
         initialWeights = initialWeights[:-sizeDifference, :]
     elif(sizeDifference < 0):
         initialWeights = np.hstack([initialWeights, env.RANDOM_GENERATOR.uniform(
@@ -61,7 +63,8 @@ def prepareWeights(trainingDatasetX):
     weightsByTime[0] = initialWeights
     env.RANDOM_GENERATOR.shuffle(weightsByTime[0], axis=0)
 
-    initialWeightsSummedByType = getSummedWeightsByType(weightsAtTimeT=weightsByTime[0])
+    initialWeightsSummedByType = getSummedWeightsByType(
+        weightsAtTimeT=weightsByTime[0])
     indexesOfWeightsByNeuronalType = {
         # Find the indexes for weights that begin positive/negative.
         "excitatory": np.where(initialWeightsSummedByType >= 0),
@@ -78,6 +81,7 @@ def prepareConsolidationEvents(weightsByTimeShape):
     consolidationsByTime = np.zeros(weightsByTimeShape)
     return consolidationsByTime
 
+
 def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
     # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
     for memoryTypeId in sorted(env.WEIGHT_MEMORY_TYPES, reverse=True):
@@ -88,7 +92,7 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
         # Get the indexes of weights that have exceeded their memory limit.
         indexesOfWeightsAboveThreshold = np.where(
             abs(newWeightsAtTimeT[:, memoryTypeId]) >= abs(env.WEIGHT_MEMORY_TYPES[memoryTypeId]['memory_size']))[0]
-        
+
         if(len(indexesOfWeightsAboveThreshold) > 0):
             # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
             consolidationsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId -

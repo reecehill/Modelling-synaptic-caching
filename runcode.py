@@ -101,7 +101,8 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternF
 # MULTI-PROCESSING EXAMPLE
 if __name__ == "__main__":# If main function
     print("Number of cpu : ", cpu_count())  
-    pool = Pool(processes=int(cpu_count()/2)) # use half the number of cpu cores available
+    # use half the number of cpu cores available
+    pool = Pool(processes=int(cpu_count()*0.5))
 
     # -- PREPARE DIRECTORY FOR OUTPUT
     directoryName = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -128,7 +129,7 @@ if __name__ == "__main__":# If main function
         if(env.VERBOSE):
             print("xPattern = "+str(xPatternFeature))
         for nPattern in env.N_PATTERNS:
-            if(((nPattern != xPatternFeature) & env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES)
+            if(((nPattern != xPatternFeature) & env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES) or (nPattern == 0)
                ):  # Avoid dividing by zero error by ensuring <
                 continue
             if(env.VERBOSE):

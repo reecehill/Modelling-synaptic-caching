@@ -5,10 +5,10 @@ SEEDS = [0,1,2]
 LEARNING_RATES = [0.1]
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [25]
+X_PATTERN_FEATURES = [100]
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
-amounts = linspace(0.05, 1.95, 300)
+amounts = linspace(0.05, 1.99, 200)
 N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
 
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
@@ -20,10 +20,11 @@ VERBOSE = False
 
 ENERGY_EXPONENT = 2
 
+WEIGHTS_BEGIN_AT_ZERO = True
 # Set simulation parameters according to preset scenarios. Enter an integer, as follows:
 # 1: Neurones have behaviour alike that in the paper.
 # 2: Prevent neurones from switching between excitatory/inhibitory (and deactivate them/set to zero if they try)
-PRESET_SIMULATION  = 1
+PRESET_SIMULATION = 1
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 MAX_SIZE_OF_TRANSIENT_MEMORY = 0.5

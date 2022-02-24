@@ -38,12 +38,15 @@ def prepareWeights(trainingDatasetX):
     for neuroneTypeName, neuroneTypeData in env.WEIGHT_MODEL.items():
         nWeights = int(round(
             (neuroneTypeData['percentage_quantity_of_neurones']/100) * env.N_WEIGHTS, 0))
-        if(env.WEIGHTS_BEGIN_AT_ZERO == True):
+        if(env.WEIGHTS_INITIALISED_AS == 'zeros'):
             randomWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
-        else:
+        elif(env.WEIGHTS_INITIALISED_AS == 'uniform'):
             randomWeights = env.RANDOM_GENERATOR.uniform(low=float(neuroneTypeData['min']), high=float(
                 neuroneTypeData['max']), size=nWeights).reshape(nWeights, 1)
-
+        elif(env.WEIGHTS_INITIALISED_AS == 'lognormal'):
+            randomWeights = env.RANDOM_GENERATOR.lognormal(mean=0, sigma=1, size=nWeights).reshape(nWeights, 1)
+            if(neuroneTypeData['max'] == 0):
+                randomWeights = randomWeights * -1
         zeroWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
         initialWeightsToAdd = np.hstack((randomWeights, zeroWeights))
         initialWeights = np.append(initialWeights, initialWeightsToAdd, axis=0)

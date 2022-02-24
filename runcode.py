@@ -3,11 +3,9 @@ import learning as l
 import energy as e
 import graphs as g
 import time
-from json import dumps
 from pandas import DataFrame
 from os import path, mkdir
 from datetime import datetime
-import numpy as np
 from multiprocessing import cpu_count, Pool
 
 

@@ -20,11 +20,16 @@ VERBOSE = False
 
 ENERGY_EXPONENT = 2
 
-WEIGHTS_BEGIN_AT_ZERO = True
+#WEIGHTS_INITIALISED_AS can be set to  one of the following strings:
+# 'zeros'
+# 'uniform'
+# 'lognormal' (mean=0, sd=1)
+
+WEIGHTS_INITIALISED_AS = 'lognormal'
 # Set simulation parameters according to preset scenarios. Enter an integer, as follows:
 # 1: Neurones have behaviour alike that in the paper.
 # 2: Prevent neurones from switching between excitatory/inhibitory (and deactivate them/set to zero if they try)
-PRESET_SIMULATION = 1
+PRESET_SIMULATION = 2
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 MAX_SIZE_OF_TRANSIENT_MEMORY = 0.5

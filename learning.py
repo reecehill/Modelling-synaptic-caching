@@ -32,7 +32,8 @@ def getDatasets():
 
   return trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY
 
-# Make a prediction with weights
+
+# Make a prediction with weights using GPU
 def predict(pattern, weightsAtTimeT):
   summedWeightsByType = w.getSummedWeightsByType(weightsAtTimeT)
   activation = np.dot(summedWeightsByType, pattern)

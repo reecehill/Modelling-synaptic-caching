@@ -2,7 +2,6 @@
 import numpy as np
 import parameters as env
 
-
 def validateParameters():
     global PERCENTAGE_INHIBITORY_WEIGHTS
     print("Skipped validation of parameters (learning)...")

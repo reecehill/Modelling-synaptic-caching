@@ -4,11 +4,14 @@ import pandas as pd
 
 
 def makeFigure1c(directoryName):
-    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=[0, 'inf', 'nan'], 
-                       usecols=[2, 3, 5, 6, 10, 15]).fillna(value='Remove')
-    data = data.where(data['Learning was complete at epoch #'] != False).where(data['Simulated: energy actually used by learning'] != 'Remove').groupby('simulationTypeNumber')
-    means = data.mean()
-    print(means['Simulated: energy actually used by learning'].to_numpy())
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
+                       usecols=[2, 3, 5, 6, 10, 15]).dropna()
+    data = data.where(data['Learning was complete at epoch #']
+                      != False).groupby('simulationTypeNumber')
+    means = data[list(['n_pattern', 'n_pattern_features',
+                 'Simulated: energy actually used by learning'])
+                 ].mean(numeric_only=True)
+
     y = means['Simulated: energy actually used by learning'].to_numpy()
     yMin = y.min() if y.min() > 0  else 0
     yMax = y.max()

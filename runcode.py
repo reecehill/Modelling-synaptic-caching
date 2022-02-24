@@ -95,13 +95,11 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternF
     print("Finished simulation (time elapsed: "+str(timeElapsed))
 
 
-
-
-
 # MULTI-PROCESSING EXAMPLE
-if __name__ == "__main__":# If main function
-    print("Number of cpu : ", cpu_count())  
-    pool = Pool(processes=int(cpu_count()/2)) # use half the number of cpu cores available
+if __name__ == "__main__":  # If main function
+    print("Number of cpu : ", cpu_count())
+    # use half the number of cpu cores available
+    pool = Pool(processes=int(cpu_count()*0.5))
 
     # -- PREPARE DIRECTORY FOR OUTPUT
     directoryName = datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -141,13 +139,11 @@ if __name__ == "__main__":# If main function
                     simulationNumber = simulationNumber + 1
                     if(env.VERBOSE):
                         print("seed = "+str(seed))
-                    
-                    result = pool.apply_async(simulate, args=(
-                        simulationNumber, simulationTypeNumber, totalSimulations, xPatternFeature, nPattern, learningRate, seed, filePath, directoryName))
-    
+                result = pool.apply_async(simulate, args=(simulationNumber, simulationTypeNumber,
+                                          totalSimulations, xPatternFeature, nPattern, learningRate, seed, filePath, directoryName))
+
     pool.close()
     pool.join()
     print("A csv file has been produced and is available at: (location of this script)/"+str(filePath))
     print("Now producing graphs...")
     g.makeFigure1c(directoryName)
-

@@ -1,20 +1,20 @@
 # CONSTANT PARAMETERS
-from numpy import random
+from numpy import random, linspace
 
 
-SEEDS = [0]
-LEARNING_RATES = [0.1]
+SEEDS = [0, 1, 2, 3, 4, 5, 6]
+LEARNING_RATES = [0.01]
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [1000]
+X_PATTERN_FEATURES = [100]
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
-amounts = [0.1,0.25,0.5,0.75,1,1.25,1.5,1.75,1.9]
+amounts = linspace(0.05, 1.95, 50)
 N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
 
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 
-MAX_EPOCHS = 3000  # Max epochs before concluding convergence is not possible
+MAX_EPOCHS = 1000  # Max epochs before concluding convergence is not possible
 # .X_PATTERN_FEATURE = N_PATTERN
 
 VERBOSE = False

@@ -7,7 +7,7 @@ def validateParameters():
 
 
 def calculateTheoreticalMinimumEnergy(weightsByEpoch):
-  return round(abs(np.sum(weightsByEpoch[-1] - weightsByEpoch[0])), 3)
+  return round(np.sum(abs(weightsByEpoch[-1] - weightsByEpoch[0])), 3)
 
 def calculateMetabolicEnergy(weightsByEpoch):
   # Synapse weights is currently rowed by epoch, rearrange so that each row is the same synapse but over time
@@ -17,7 +17,7 @@ def calculateMetabolicEnergy(weightsByEpoch):
 
 
 def calculateEfficiency(metabolicEnergy, theoreticalMinimumEnergy):
-  return round((metabolicEnergy / theoreticalMinimumEnergy), 3)
+  return round((metabolicEnergy - theoreticalMinimumEnergy), 3)
 
 
 def calculateTheoreticalEfficiency():
@@ -50,12 +50,12 @@ def calculateEnergyFromMaintenance(weightsByEpoch):
   return round(np.sum(energyConsumedByMaintenance), 3)
 
 
-def calculateEnergyFromConsolidations(calculateEnergyFromConsolidation):
+def calculateEnergyFromConsolidations(consolidationsByEpoch):
   # Synapse weight changes are currently rowed by epoch, rearrange so that each row is the same synapse but over time
-  calculateEnergyFromConsolidation = np.transpose(
-      calculateEnergyFromConsolidation)
+  consolidationsByEpoch = np.transpose(
+      consolidationsByEpoch)
   summedConsolidationsForAllTimes = np.sum(
-      np.abs(calculateEnergyFromConsolidation), axis=1)
+      np.abs(consolidationsByEpoch), axis=1)
   summedConsolidationsForAllTimesAndMemoryTypes = np.sum(
       summedConsolidationsForAllTimes, axis=1)
   

@@ -134,3 +134,13 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
         except:
             print("Neurones must be allowed to switch type (i.e., inhibitory->excitatory) if there is only one neurone type. You may #want to check the NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY parameter.")
     return weightsAtTimeT, consolidationsAtTimeT
+
+
+def updateNextWeights(weightsAtTimeT):
+    decayRatesByMemoryType = np.asarray([1 - x['decay_tau'] for x in env.WEIGHT_MEMORY_TYPES.values()])
+
+    weightsAtTimeTPlusOne = np.zeros(shape=weightsAtTimeT.shape)
+    for weightsId, weights in enumerate(weightsAtTimeT):
+        newWeights = np.multiply(weights, decayRatesByMemoryType)
+        weightsAtTimeTPlusOne[weightsId,:] = newWeights
+    return weightsAtTimeTPlusOne

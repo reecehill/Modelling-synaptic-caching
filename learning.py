@@ -57,9 +57,11 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       weightsByTime[epochIndex], consolidationsByTime[epochIndex] = w.updateWeights(
           weightsByTime[epochIndex], deltaWeights, neuronalTypes, consolidationsByTime[epochIndex])
 
-    # Set the proceding weight timestep to be equal to that of the current timestep (so predictions are not made from zeros).
+    # Set the proceding weight timestep (so predictions are not made from zeros), either:
+    # ...to be equal to that of the current timestep (if memory does not decay) OR
+    # ...to be a function of exponential decay to zero (f memory decays)
     if(epochIndex != env.MAX_EPOCHS-1):
-      weightsByTime[epochIndex+1] = weightsByTime[epochIndex]
+      weightsByTime[epochIndex+1] = w.updateNextWeights(weightsByTime[epochIndex])
     if(sum_mse == 0.0):
       # No weights were changed this epoch. Therefore, assume learning is complete and stop
       epochIndexForConvergence = epochIndex

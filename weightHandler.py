@@ -137,10 +137,15 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
 
 
 def updateNextWeights(weightsAtTimeT):
-    decayRatesByMemoryType = np.asarray([1 - x['decay_tau'] for x in env.WEIGHT_MEMORY_TYPES.values()])
-
+    decayRatesByMemoryType = np.asarray([x['decay_tau'] for x in env.WEIGHT_MEMORY_TYPES.values()])
+    nonZeroDecayRates = np.nonzero(decayRatesByMemoryType)
+    # Set all decay terms to one (i.e. no decay) temporarily
+    decayTerms = np.ones(shape = weightsAtTimeT[0].shape)
+    # For those weights that decay, get their decay term
+    decayTerms[nonZeroDecayRates] = np.exp(-1 / decayRatesByMemoryType[nonZeroDecayRates])
     weightsAtTimeTPlusOne = np.zeros(shape=weightsAtTimeT.shape)
     for weightsId, weights in enumerate(weightsAtTimeT):
-        newWeights = np.multiply(weights, decayRatesByMemoryType)
+        #newWeights = np.multiply(weights, decayRatesByMemoryType)
+        newWeights = np.multiply(weights, decayTerms)
         weightsAtTimeTPlusOne[weightsId,:] = newWeights
     return weightsAtTimeTPlusOne

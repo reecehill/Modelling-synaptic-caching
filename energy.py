@@ -63,10 +63,9 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
 # TODO: Refactor this loop.
   energyConstantsByMemoryType = []
   for memoryTypeId, memoryTypeData in env.WEIGHT_MEMORY_TYPES.items():
-    if(memoryTypeData['cost_of_consolidation'] == None):
-      continue
     energyConstantsByMemoryType.append(memoryTypeData['cost_of_consolidation'])
   
-  energyConsumedByConsolidation = np.multiply(
+  consolidationEnergyByMemoryType = np.multiply(
       summedConsolidationsForAllTimesAndMemoryTypes, energyConstantsByMemoryType)
-  return round(np.sum(energyConsumedByConsolidation), 3)
+  summedConsolidationEnergy = np.sum(consolidationEnergyByMemoryType)
+  return round(summedConsolidationEnergy, 3)

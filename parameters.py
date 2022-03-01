@@ -5,8 +5,8 @@ from numpy import random, linspace
 # Alternatively, set to directory name, relative to runcode.py file, that contains .csv file from previous simulations. Usually, this is a timestamp, eg. '20220224-224209'
 RUN_SIMULATION = True
 
-SEEDS = [0, 1, 2, 3, 4, 5]
-LEARNING_RATES = [0.1]
+SEEDS = [0]
+LEARNING_RATES = [5]
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
 X_PATTERN_FEATURES = [500]
@@ -39,7 +39,7 @@ WEIGHTS_INITIALISED_AS = 'zeros'
 PRESET_SIMULATION = 1
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = list(linspace(0.001, 40, 40))
+MAX_SIZES_OF_TRANSIENT_MEMORY = list(linspace(0.001, 80, 80))
 
 
 # *-*-*-*-*-*-

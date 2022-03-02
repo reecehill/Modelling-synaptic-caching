@@ -1,5 +1,12 @@
-from sys import maxsize
-import parameters as env
+import system_configuration as conf
+
+# Get the parameters either from main parameters.py, or from a previous simulation 
+if(conf.RUN_SIMULATION == True):
+    import parameters as env
+else:
+    import importlib
+    env = importlib.import_module('parameters', conf.RUN_SIMULATION)
+
 import learning as l
 import energy as e
 import graphs as g
@@ -8,7 +15,7 @@ from pandas import DataFrame
 from os import path, mkdir
 from datetime import datetime
 from multiprocessing import cpu_count, Pool
-from json import dump
+from shutil import copyfile
 from itertools import product
 
 
@@ -97,9 +104,9 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         header = list(report[simulationNumber].keys())
         columns = header
 
-    # Save the generated weight model to json file too (so we can reproduce the decay rate etc. if needed)
-    jsonFile = open(filePath[:-4]+'.json', 'w+')
-    dump(env.WEIGHT_MODEL, jsonFile)
+    # Copy the parameters file too (so output can be reproduced)
+    copyfile('parameters.py', str(filePath[:-10])+'parameters.py') # TODO: we lazily remove output.csv to get the folder
+    copyfile('__init__.py', str(filePath[:-10])+'__init__.py')
 
     DataFrame.from_dict(report).transpose().to_csv(
         filePath, header=header, columns=columns, mode=mode)
@@ -108,51 +115,53 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
     timeElapsed = time.time() - start
     print("Finished simulation (time elapsed: "+str(timeElapsed))
 
+def getAllSimulationPossibilities():
+    global TOTAL_SIMULATIONS
+    global COMMON_N_PATTERNS_X_PATTERN_FEATURES
+
+    # Only take N_PATTERNS found in X_PATTERN_FEATURES, if instructed.
+    if(env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES):
+        COMMON_N_PATTERNS_X_PATTERN_FEATURES = list(
+            set(env.N_PATTERNS) & set(env.X_PATTERN_FEATURES))
+        env.N_PATTERNS = COMMON_N_PATTERNS_X_PATTERN_FEATURES
+        env.X_PATTERN_FEATURES = COMMON_N_PATTERNS_X_PATTERN_FEATURES
+    else:
+        COMMON_N_PATTERNS_X_PATTERN_FEATURES = []
+
+    # Returns a list of all possible permutations of the parameters for looping later.
+    allSimulations = list(product(env.CACHE_ALGORITHMS, env.X_PATTERN_FEATURES, env.N_PATTERNS,
+                       env.LEARNING_RATES, env.MAX_SIZES_OF_TRANSIENT_MEMORY, env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY))
+    TOTAL_SIMULATIONS = len(allSimulations) * len(env.SEEDS)
+    return allSimulations
+        
+
 
 # MULTI-PROCESSING EXAMPLE
 if __name__ == "__main__":  # If main function
-
+    allSimulations = getAllSimulationPossibilities()
     # Process new simulation if requested,
-    if(env.RUN_SIMULATION == True):
+    if(conf.RUN_SIMULATION == True):
         cpuCount = cpu_count()
         print("Number of cpu : ", cpuCount)
-        pool = Pool(processes=int(cpuCount*(env.PERCENTAGE_OF_CPU_CORES/100)))
+        pool = Pool(processes=int(cpuCount*(conf.PERCENTAGE_OF_CPU_CORES/100)))
 
         # -- PREPARE DIRECTORY FOR OUTPUT
         directoryName = datetime.now().strftime("%Y%m%d-%H%M%S")
         mkdir(directoryName)
         filePath = directoryName+'/output.csv'
 
-        # Calculate number of possibilities so that total number of simulations can be printed.
-        nXPatternFeaturesAboveNPatterns = 0
-        for xPatternFeature in env.X_PATTERN_FEATURES:
-            n = [x for x in env.N_PATTERNS if (
-                (x != xPatternFeature) & env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES) or env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES == False]
-            nXPatternFeaturesAboveNPatterns += len(n)
-
         # Prepare and print total number of simulations
         simulationNumber = 0
-        totalSimulations = nXPatternFeaturesAboveNPatterns * \
-            len(env.LEARNING_RATES) * \
-            len(env.MAX_SIZES_OF_TRANSIENT_MEMORY) * \
-            len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY) * \
-            len(env.CACHE_ALGORITHMS) *  len(env.SEEDS)
-        print("Simulation "+str(simulationNumber)+" of "+str(totalSimulations))
-
-        # Loop through all possible global settings.
-        
         simulationTypeNumber = 0  # Allows for averaging of seeds
-        allSimulations = product(env.CACHE_ALGORITHMS, env.X_PATTERN_FEATURES, env.N_PATTERNS,
-                                 env.LEARNING_RATES, env.MAX_SIZES_OF_TRANSIENT_MEMORY, env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY)
-        
-        for cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory in \
-            allSimulations:
+        print("Simulation "+str(simulationNumber)+" of "+str(TOTAL_SIMULATIONS))
+
+        for cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory in allSimulations:
             simulationTypeNumber += 1
             for seed in env.SEEDS:
                 simulationNumber += 1
                 #TODO: Print status when verbose == true
                 result = pool.apply_async(simulate, args=(
-                    simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, seed, filePath, directoryName))
+                    simulationNumber, simulationTypeNumber, TOTAL_SIMULATIONS, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, seed, filePath, directoryName))
 
         pool.close()
         pool.join()
@@ -160,10 +169,28 @@ if __name__ == "__main__":  # If main function
         print("Now producing graphs...")
     # Use data from old simulation.
     else:
-        directoryName = env.RUN_SIMULATION
+        directoryName = conf.RUN_SIMULATION
+    
 
-    #fig1c = g.makeFigure1c(directoryName)
-    #fig1d = g.makeFigure1d(directoryName)
-    #fig2b = g.makeFigure2b(directoryName)
-    fig4b = g.makeFigure4b(directoryName)
+    # If only the N_PATTERNS and X_PATTERN_FEATURES are varied... 
+    if(( (env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES != True) & \
+         (TOTAL_SIMULATIONS == (len(env.N_PATTERNS) * len(env.X_PATTERN_FEATURES) * len(env.SEEDS))) \
+         ) or \
+        ((env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES == True) & (TOTAL_SIMULATIONS == (len(COMMON_N_PATTERNS_X_PATTERN_FEATURES) * len(env.SEEDS))))):
+        fig1c = g.makeFigure1c(directoryName)
+        fig1d = g.makeFigure1d(directoryName)
+    else:
+        print("Skipped producing Figure 1c and 1d. To produce this figure, fix all parameters but N_PATTERNS and X_PATTERN_FEATURES")
+
+    if(TOTAL_SIMULATIONS == (len(env.MAX_SIZES_OF_TRANSIENT_MEMORY))):
+        fig2b = g.makeFigure2b(directoryName)
+    else:
+        print("Skipped producing Figure 2b. To produce this figure, fix all parameters but MAX_SIZES_OF_TRANSIENT_MEMORY. You may have to check the neurone and memory types are set correctly too. ")
+
+    if(TOTAL_SIMULATIONS == (len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY))):
+        fig4b = g.makeFigure4b(directoryName)
+    else:
+        print("Skipped producing Figure 4b. To produce this figure, fix all parameters but MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY. You may have to check the neurone and memory types are set correctly too.")
+
+
     g.showFigures()

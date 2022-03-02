@@ -97,6 +97,7 @@ def makeFigure2b(directoryName):
     return fig
 
 def makeFigure4b(directoryName):
+    # Figure 4b does not work because the ideal consolidation thresholds must be calculated for each cache algorithm and maintenance cost. 
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
                        usecols=[2, 3, 10, 15, 17, 18, 31, 33]).dropna()
     
@@ -107,12 +108,10 @@ def makeFigure4b(directoryName):
     
     for cacheAlgorithm in usedCacheAlgorithms:
         groupedData = data.where(data['Learning was complete at epoch #'] != False)\
-            .where(data['cache_algorithm'] == cacheAlgorithm).sort_values(
-            'maintenance_cost_of_transient_memory').groupby('simulationTypeNumber')
-        means = groupedData[list(['maintenance_cost_of_transient_memory',
+            .where(data['cache_algorithm'] == cacheAlgorithm).groupby('simulationTypeNumber')
+        means = groupedData[['maintenance_cost_of_transient_memory',
                        'Energy expended by simulations for consolidations',
-                       'Energy expended by simulations for maintenance'])
-                 ].mean(numeric_only=True).sort_values('maintenance_cost_of_transient_memory')
+                       'Energy expended by simulations for maintenance']].mean(numeric_only=True).sort_values('maintenance_cost_of_transient_memory')
         x = means['maintenance_cost_of_transient_memory'].to_numpy()
         y = means['Energy expended by simulations for consolidations'].to_numpy(
         ) + means['Energy expended by simulations for maintenance'].to_numpy()

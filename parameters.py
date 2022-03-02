@@ -1,15 +1,5 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-# The simulation can use multiple cores for speed. Enter an integer to specify the maximum percentage of total available cores that the script will use.
-# e.g., A value of 80 will lead to 80% of all cores being used.
-# Where there are 12 cores available, 12*0.8=9.6. Rounding down means 9 cores will be used.
-# Recommend between 50 and 80.
-PERCENTAGE_OF_CPU_CORES = 80
-
-# Set to True to run simulation and generate data.
-# Alternatively, set to directory name, relative to runcode.py file, that contains .csv file from previous simulations. Usually, this is a timestamp, eg. '20220224-224209'
-RUN_SIMULATION = '20220302-191455'
-
 SEEDS = [0, 1, 2]
 
 LEARNING_RATES = [0.1]
@@ -22,7 +12,7 @@ X_PATTERN_FEATURES = [250]
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [250]
+N_PATTERNS = [250,300]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
@@ -50,14 +40,14 @@ PRESET_SIMULATION = 1
 # 'local-local': Any one synapse that exceeds a threshold (local), will lead to just that synapse consolidating (local).
 # 'local-global': Any one synapse that exceeds a threshold (local), will lead to all synapses of that neurone consolidating (global).
 # 'global-global': Once all synapses exceed a threshold (global), all synapses of that neurone will be consolidated (global).
-CACHE_ALGORITHMS = ['local-local','local-global','global-global']
+CACHE_ALGORITHMS = ['local-local']
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = [4]
+MAX_SIZES_OF_TRANSIENT_MEMORY = [1]
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
-MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = list(linspace(0.001, 0.1, 30))
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = [0.1]
 
 # *-*-*-*-*-*-
 # !! STOP !!
@@ -161,7 +151,7 @@ def generateWeightModel():
                 'memory_size': False,
                 'decay_tau': 0,  # amount memory decays per time step
                 'cost_of_maintenance': 0,
-                'cost_of_consolidation': 2,
+                'cost_of_consolidation': 1,
             },
             1: {
                 'name': 'transient',

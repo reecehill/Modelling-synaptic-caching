@@ -59,12 +59,12 @@ if __name__ == "__main__":  # If main function
     else:
         print("Skipped producing Figure 1c and 1d. To produce this figure, fix all parameters but N_PATTERNS and X_PATTERN_FEATURES")
 
-    if(s.TOTAL_SIMULATIONS == (len(env.MAX_SIZES_OF_TRANSIENT_MEMORY))):
+    if(s.TOTAL_SIMULATIONS == (len(env.MAX_SIZES_OF_TRANSIENT_MEMORY) * len(env.SEEDS))):
         fig2b = g.makeFigure2b(directoryName)
     else:
         print("Skipped producing Figure 2b. To produce this figure, fix all parameters but MAX_SIZES_OF_TRANSIENT_MEMORY. You may have to check the neurone and memory types are set correctly too. ")
 
-    if(s.TOTAL_SIMULATIONS == (len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY))):
+    if(s.TOTAL_SIMULATIONS == (len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY) * len(env.SEEDS))):
         fig4b = g.makeFigure4b(directoryName)
     else:
         print("Skipped producing Figure 4b. To produce this figure, fix all parameters but MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY. You may have to check the neurone and memory types are set correctly too.")

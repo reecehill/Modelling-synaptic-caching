@@ -7,6 +7,7 @@ from pandas import DataFrame
 from os import path, mkdir
 from datetime import datetime
 from multiprocessing import cpu_count, Pool
+from json import dump
 
 
 def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, seed, filePath, directoryName):
@@ -75,7 +76,9 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternF
             '(unseen) Sensitivity': str(testSensitivity)+'%',
             '(unseen) Specificity': str(testSpecificity)+'%',
             'weights_initialised_as': str(env.WEIGHTS_INITIALISED_AS),
+            'cache_algorithm': str(env.CACHE_ALGORITHM),
             'max_size_of_transient_memory': str(maxSizeOfTransientMemory),
+
         }
     }
 
@@ -87,6 +90,10 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternF
         mode = 'w'
         header = list(report[simulationNumber].keys())
         columns = header
+
+    # Save the generated weight model to json file too (so we can reproduce the decay rate etc. if needed)
+    jsonFile = open(filePath[:-4]+'.json', 'w+')
+    dump(env.WEIGHT_MODEL, jsonFile)
 
     DataFrame.from_dict(report).transpose().to_csv(
         filePath, header=header, columns=columns, mode=mode)

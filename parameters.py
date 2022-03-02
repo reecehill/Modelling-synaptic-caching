@@ -1,5 +1,4 @@
 # CONSTANT PARAMETERS
-from pickle import TRUE
 from numpy import random, linspace
 # The simulation can use multiple cores for speed. Enter an integer to specify the maximum percentage of total available cores that the script will use.
 # e.g., A value of 80 will lead to 80% of all cores being used.

@@ -43,12 +43,12 @@ if __name__ == "__main__":  # If main function
         pool.close()
         pool.join()
         print("A csv file has been produced and is available at: (location of this script)/"+str(filePath))
-        print("Now producing graphs...")
+        
 
     else:
         directoryName = conf.RUN_SIMULATION
     
-
+    print("Now producing graphs...")
     # If only the N_PATTERNS and X_PATTERN_FEATURES are varied... 
     if(( (env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES != True) & \
          (s.TOTAL_SIMULATIONS == (len(env.N_PATTERNS) * len(env.X_PATTERN_FEATURES) * len(env.SEEDS))) \

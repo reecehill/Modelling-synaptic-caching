@@ -8,7 +8,7 @@ PERCENTAGE_OF_CPU_CORES = 80
 
 # Set to True to run simulation and generate data.
 # Alternatively, set to directory name, relative to runcode.py file, that contains .csv file from previous simulations. Usually, this is a timestamp, eg. '20220224-224209'
-RUN_SIMULATION = True
+RUN_SIMULATION = '20220302-191455'
 
 SEEDS = [0, 1, 2]
 
@@ -166,7 +166,7 @@ def generateWeightModel():
             1: {
                 'name': 'transient',
                 'memory_size': MAX_SIZE_OF_TRANSIENT_MEMORY,
-                'decay_tau': 0.02,  # amount memory decays per time step
+                'decay_tau': 0.0,  # amount memory decays per time step
                 'cost_of_maintenance': MAINTENANCE_COST_OF_TRANSIENT_MEMORY,
                 # The highest memory type does not receive weights for consolidation.
                 'cost_of_consolidation': 0

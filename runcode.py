@@ -164,5 +164,6 @@ if __name__ == "__main__":  # If main function
 
     #fig1c = g.makeFigure1c(directoryName)
     #fig1d = g.makeFigure1d(directoryName)
-    fig2b = g.makeFigure2b(directoryName)
+    #fig2b = g.makeFigure2b(directoryName)
+    fig4b = g.makeFigure4b(directoryName)
     g.showFigures()

@@ -88,7 +88,7 @@ def makeFigure2b(directoryName):
 
     #plt.yscale('log')
     # Setting the boundaries of the figure
-    plt.ylim(0, 3*10**6)
+    #plt.ylim(0, 3*10**6)
     plt.xlim(0, 40)
     plt.xlabel('Consolidation threshold')  # add x-label
     plt.ylabel('Energy used (a.u.)')  # add y-label

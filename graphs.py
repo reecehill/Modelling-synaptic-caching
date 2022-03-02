@@ -66,7 +66,7 @@ def makeFigure1d(directoryName):
 
 def makeFigure2b(directoryName):
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
-                       usecols=[2, 3, 10, 15, 17, 18, 31]).dropna()
+                       usecols=[2, 3, 10, 15, 17, 18, 32]).dropna()
     data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
         'max_size_of_transient_memory').groupby('simulationTypeNumber')
     means = data[list(['max_size_of_transient_memory',

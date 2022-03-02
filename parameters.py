@@ -11,26 +11,26 @@ PERCENTAGE_OF_CPU_CORES = 80
 # Alternatively, set to directory name, relative to runcode.py file, that contains .csv file from previous simulations. Usually, this is a timestamp, eg. '20220224-224209'
 RUN_SIMULATION = True
 
-SEEDS = [0,1,2,3,4]
+SEEDS = [0,1]
 
-LEARNING_RATES = [2]
+LEARNING_RATES = [0.1]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [250]
+X_PATTERN_FEATURES = [1000]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [250]
+N_PATTERNS = [1000]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 1000  
+MAX_EPOCHS = 10000  
 
 ENERGY_EXPONENT = 1
 
@@ -51,10 +51,10 @@ PRESET_SIMULATION = 1
 # 'local-local': Any one synapse that exceeds a threshold (local), will lead to just that synapse consolidating (local).
 # 'local-global': Any one synapse that exceeds a threshold (local), will lead to all synapses of that neurone consolidating (global).
 # 'global-global': Once all synapses exceed a threshold (global), all synapses of that neurone will be consolidated (global).
-CACHE_ALGORITHM = 'local-local'
+CACHE_ALGORITHM = 'local-global'
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = list(linspace(0.001, 40, 50))
+MAX_SIZES_OF_TRANSIENT_MEMORY = list(linspace(0.001, 40, 20))
 
 
 # *-*-*-*-*-*-
@@ -152,12 +152,12 @@ def generateWeightModel():
                 'memory_size': False,
                 'decay_tau': 0,  # amount memory decays per time step
                 'cost_of_maintenance': 0,
-                'cost_of_consolidation': 2,
+                'cost_of_consolidation': 1,
             },
             1: {
                 'name': 'transient',
                 'memory_size': MAX_SIZE_OF_TRANSIENT_MEMORY,
-                'decay_tau': 0.1,  # amount memory decays per time step
+                'decay_tau': 0.02,  # amount memory decays per time step
                 'cost_of_maintenance': 1,
                 # The highest memory type does not receive weights for consolidation.
                 'cost_of_consolidation': 0

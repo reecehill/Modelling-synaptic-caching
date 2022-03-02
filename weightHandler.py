@@ -86,26 +86,55 @@ def prepareConsolidationEvents(weightsByTimeShape):
 
 
 def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
-    # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
-    for memoryTypeId in sorted(env.WEIGHT_MEMORY_TYPES, reverse=True):
-        # Skip "consolidated" memory types (or memory types without limit)
-        if(memoryTypeId == 0 or env.WEIGHT_MEMORY_TYPES[memoryTypeId]['memory_size'] == False):
-            continue
+    # Loop through the different neurones simulated (e.g. excitatory, inhibitory)
+    for neuroneTypeId, neuroneType in env.WEIGHT_NEURONE_TYPES.items():
+        # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
+        for memoryTypeId, memoryType in sorted(neuroneType['memoryTypes'].items(), reverse=True):
+            # Skip "consolidated" memory types (or memory types without limit)
+            if(memoryTypeId == 0 or memoryType['memory_size'] == False):
+                continue
 
-        # Get the indexes of weights that have exceeded their memory limit.
-        indexesOfWeightsAboveThreshold = np.where(
-            abs(newWeightsAtTimeT[:, memoryTypeId]) >= abs(env.WEIGHT_MEMORY_TYPES[memoryTypeId]['memory_size']))[0]
+            # Get the indexes of weights that have exceeded their memory limit.
+            indexesOfWeightsAboveThreshold = np.where(
+                abs(newWeightsAtTimeT[:, memoryTypeId]) >= abs(memoryType['memory_size']))[0]
 
-        if(len(indexesOfWeightsAboveThreshold) > 0):
-            # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
-            consolidationsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId -
-                                  1] = newWeightsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId]
+            # If one or more synapse(s) has met the threshold for the memory type...
+            if(len(indexesOfWeightsAboveThreshold) > 0):
+                
+                
+                if(env.CACHE_ALGORITHM == 'local-local'): # Only consolidate individual synapses that have met threshold.
+                    # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
+                    consolidationsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId -
+                                        1] = newWeightsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId]
+                    # Submit consolidations
+                    newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
+                    # Reset values to zero if consolidated.
+                    newWeightsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId] = 0
 
-            # Submit consolidations
-            newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
+                elif(env.CACHE_ALGORITHM == 'local-global'): # Consolidate all synapses as one synapse has hit threshold.
+                    # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
+                    consolidationsAtTimeT[:, memoryTypeId -
+                                          1] = newWeightsAtTimeT[:, memoryTypeId]
+                    # Submit consolidations
+                    newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
+                    # Reset all values for memory type to zero as they have been consolidated.
+                    newWeightsAtTimeT[:, memoryTypeId] = 0
+                
+                elif(env.CACHE_ALGORITHM == 'global-global'):
+                    if(len(indexesOfWeightsAboveThreshold) == len(newWeightsAtTimeT[:, memoryTypeId])):
+                        # All values of this memory type have exceeded their threshold.
 
-            # Reset values to zero if it was consolidated.
-            newWeightsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId] = 0
+                        # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
+                        consolidationsAtTimeT[:, memoryTypeId - 1] = newWeightsAtTimeT[:, memoryTypeId]
+                        # Submit consolidations
+                        newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
+                        # Reset all values for memory type to zero as they have been consolidated.
+                        newWeightsAtTimeT[:, memoryTypeId] = 0
+                    else:
+                        # Caching algorithm is set to global-global, but thresholds are not met globally. So do not consolidate yet
+                        continue
+                else:
+                    raise ValueError('Incorrect CACHING_ALGORITHM specified. Please refer to the comments in parameters.py')
 
     return newWeightsAtTimeT, consolidationsAtTimeT
 
@@ -139,13 +168,24 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
 def updateNextWeights(weightsAtTimeT):
     decayRatesByMemoryType = np.asarray([x['decay_tau'] for x in env.WEIGHT_MEMORY_TYPES.values()])
     nonZeroDecayRates = np.nonzero(decayRatesByMemoryType)
+    
+    
     # Set all decay terms to one (i.e. no decay) temporarily
     decayTerms = np.ones(shape = weightsAtTimeT[0].shape)
-    # For those weights that decay, get their decay term
-    decayTerms[nonZeroDecayRates] = np.exp(-1 / decayRatesByMemoryType[nonZeroDecayRates])
+    
+    
+    # For those weights that decay, change their decay term (currently one)
+        # ... Using exp()
+    # decayTerms[nonZeroDecayRates] = np.exp(-1 / decayRatesByMemoryType[nonZeroDecayRates])
+        # ... Using 1-decay_rate
+    decayTerms[nonZeroDecayRates] = np.subtract(1, decayRatesByMemoryType[nonZeroDecayRates])
+
+
     weightsAtTimeTPlusOne = np.zeros(shape=weightsAtTimeT.shape)
     for weightsId, weights in enumerate(weightsAtTimeT):
         #newWeights = np.multiply(weights, decayRatesByMemoryType)
         newWeights = np.multiply(weights, decayTerms)
         weightsAtTimeTPlusOne[weightsId,:] = newWeights
+
+
     return weightsAtTimeTPlusOne

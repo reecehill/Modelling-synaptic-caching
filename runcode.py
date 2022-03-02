@@ -101,9 +101,9 @@ if __name__ == "__main__":  # If main function
 
     # Process new simulation if requested,
     if(env.RUN_SIMULATION == True):
-        print("Number of cpu : ", cpu_count())
-        # use half the number of cpu cores available
-        pool = Pool(processes=int(cpu_count()*0.8))
+        cpuCount = cpu_count()
+        print("Number of cpu : ", cpuCount)
+        pool = Pool(processes=int(cpuCount*(env.PERCENTAGE_OF_CPU_CORES/100)))
 
         # -- PREPARE DIRECTORY FOR OUTPUT
         directoryName = datetime.now().strftime("%Y%m%d-%H%M%S")

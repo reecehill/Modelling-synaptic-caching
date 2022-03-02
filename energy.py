@@ -33,7 +33,10 @@ def calculateTheoreticalEfficiency():
 def calculateEnergyFromMaintenance(weightsByEpoch):
   # Synapse weight changes are currently rowed by epoch, rearrange so that each row is the same synapse but over time
   weightsByEpoch = np.transpose(weightsByEpoch)
-  summedWeightsForAllTimes = np.sum(np.abs(weightsByEpoch), axis=1)
+  #∑_t|s_i(t)|)
+  summedWeightsForAllTimes = np.sum(np.abs(weightsByEpoch), axis=1)  
+  
+  #∑_i( ∑_t|s_i(t)|) )
   summedWeightsForAllTimesAndMemoryTypes = np.sum(
       summedWeightsForAllTimes, axis=1)
   
@@ -45,6 +48,7 @@ def calculateEnergyFromMaintenance(weightsByEpoch):
       continue
     energyConstantsByMemoryType.append(memoryTypeData['cost_of_maintenance'])
   
+  # c * ∑_i( ∑_t|s_i(t)|) )
   energyConsumedByMaintenance = np.multiply(
       summedWeightsForAllTimesAndMemoryTypes, energyConstantsByMemoryType)
   return round(np.sum(energyConsumedByMaintenance), 3)
@@ -52,12 +56,17 @@ def calculateEnergyFromMaintenance(weightsByEpoch):
 
 def calculateEnergyFromConsolidations(consolidationsByEpoch):
   # Synapse weight changes are currently rowed by epoch, rearrange so that each row is the same synapse but over time
-  consolidationsByEpoch = np.transpose(
+  consolidationsByTime = np.transpose(
       consolidationsByEpoch)
-  summedConsolidationsForAllTimes = np.sum(
-      np.abs(consolidationsByEpoch), axis=1)
-  summedConsolidationsForAllTimesAndMemoryTypes = np.sum(
-      summedConsolidationsForAllTimes, axis=1)
+
+  # | l_i(t) - l_i (t-1) |
+  changeInWeightsPerTimeStep = np.abs(np.diff(consolidationsByTime))
+
+  # ∑_t (| l_i(t) - l_i (t-1) |)
+  summedConsolidationsForAllTimes = np.sum(changeInWeightsPerTimeStep, axis=1)
+
+  # ∑_i ∑_t (| l_i(t) - l_i (t-1) |)
+  summedConsolidationsForAllTimesAndMemoryTypes = np.sum(summedConsolidationsForAllTimes, axis=1)
   
 
 # TODO: Refactor this loop.
@@ -65,7 +74,15 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
   for memoryTypeId, memoryTypeData in env.WEIGHT_MEMORY_TYPES.items():
     energyConstantsByMemoryType.append(memoryTypeData['cost_of_consolidation'])
   
+  
+  # c * ∑_i ∑_t (| l_i(t) - l_i (t-1) |)
+  # NOTE: The paper considers c=1 for consolidations. I.e., the cost of consolidation is equal to the change in weight.
   consolidationEnergyByMemoryType = np.multiply(
       summedConsolidationsForAllTimesAndMemoryTypes, energyConstantsByMemoryType)
+  
+  # The consolidation energy so far, is stored as a vector. With each element representing the consolidation energy required per memory type (e.g., persistent, persisent2, transient). 
+  # NOTE: The paper considers only persistent memory as a memory type that accepts consolidation.
+
+  # Get sum of vector.
   summedConsolidationEnergy = np.sum(consolidationEnergyByMemoryType)
   return round(summedConsolidationEnergy, 3)

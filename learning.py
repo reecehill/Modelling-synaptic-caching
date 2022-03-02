@@ -1,8 +1,7 @@
-import numpy as np
 import parameters as env
 import weightHandler as w
 import evaluate as eval
-
+import numpy as np
 def validateParameters():
   w.validateParameters()
   global MAX_EPOCHS

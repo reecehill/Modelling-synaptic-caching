@@ -1,6 +1,5 @@
-import numpy as np
 import parameters as env
-
+import numpy as np
 def validateParameters():
   global ENERGY_EXPONENT
   print("Skipped validation of parameters (energy)...")

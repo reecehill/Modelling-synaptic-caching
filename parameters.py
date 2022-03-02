@@ -10,26 +10,26 @@ PERCENTAGE_OF_CPU_CORES = 80
 # Alternatively, set to directory name, relative to runcode.py file, that contains .csv file from previous simulations. Usually, this is a timestamp, eg. '20220224-224209'
 RUN_SIMULATION = True
 
-SEEDS = [0,1]
+SEEDS = [0, 1, 2]
 
 LEARNING_RATES = [0.1]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [1000]
+X_PATTERN_FEATURES = [250]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [1000]
+N_PATTERNS = [250]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 10000  
+MAX_EPOCHS = 1000
 
 ENERGY_EXPONENT = 1
 
@@ -37,7 +37,7 @@ VERBOSE = False
 
 # WEIGHTS_INITIALISED_AS can be set to  one of the following strings:
 # 'zeros'
-# 'uniform'
+# 'uniform' (where min and max are taken from the memory_types min and max values)
 # 'lognormal' (mean=0, sd=1)
 WEIGHTS_INITIALISED_AS = 'zeros'
 
@@ -50,11 +50,14 @@ PRESET_SIMULATION = 1
 # 'local-local': Any one synapse that exceeds a threshold (local), will lead to just that synapse consolidating (local).
 # 'local-global': Any one synapse that exceeds a threshold (local), will lead to all synapses of that neurone consolidating (global).
 # 'global-global': Once all synapses exceed a threshold (global), all synapses of that neurone will be consolidated (global).
-CACHE_ALGORITHM = 'local-global'
+CACHE_ALGORITHMS = ['local-local','local-global','global-global']
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = list(linspace(0.001, 40, 20))
+MAX_SIZES_OF_TRANSIENT_MEMORY = [4]
 
+# Only in effect when neurones are allowed to have transient/consolidated memory types.
+# Used for figure 4 of paper.
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = list(linspace(0.001, 0.1, 30))
 
 # *-*-*-*-*-*-
 # !! STOP !!
@@ -71,6 +74,10 @@ elif(PRESET_SIMULATION == 2):
     NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY = True
 
 
+def setCacheAlgorithm(cacheAlgorithm):
+    global CACHE_ALGORITHM
+    CACHE_ALGORITHM = cacheAlgorithm
+
 def setSeed(seed):
     global RANDOM_GENERATOR
     RANDOM_GENERATOR = random.default_rng(seed)
@@ -84,7 +91,10 @@ def setLearningRate(learningRate):
 def setMaxSizeOfTransientMemory(maxSizeOfTransientMemory):
     global MAX_SIZE_OF_TRANSIENT_MEMORY
     MAX_SIZE_OF_TRANSIENT_MEMORY = maxSizeOfTransientMemory
-    setWeightModel()
+
+def setMaintenaceCostOfTransientMemory(maintenanceCostOfTransientMemory):
+    global MAINTENANCE_COST_OF_TRANSIENT_MEMORY
+    MAINTENANCE_COST_OF_TRANSIENT_MEMORY = maintenanceCostOfTransientMemory
 
 
 def setNPattern(nPattern):
@@ -151,13 +161,13 @@ def generateWeightModel():
                 'memory_size': False,
                 'decay_tau': 0,  # amount memory decays per time step
                 'cost_of_maintenance': 0,
-                'cost_of_consolidation': 1,
+                'cost_of_consolidation': 2,
             },
             1: {
                 'name': 'transient',
                 'memory_size': MAX_SIZE_OF_TRANSIENT_MEMORY,
                 'decay_tau': 0.02,  # amount memory decays per time step
-                'cost_of_maintenance': 1,
+                'cost_of_maintenance': MAINTENANCE_COST_OF_TRANSIENT_MEMORY,
                 # The highest memory type does not receive weights for consolidation.
                 'cost_of_consolidation': 0
             }

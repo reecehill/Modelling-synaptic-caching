@@ -1,3 +1,4 @@
+from sys import maxsize
 import parameters as env
 import learning as l
 import energy as e
@@ -8,14 +9,18 @@ from os import path, mkdir
 from datetime import datetime
 from multiprocessing import cpu_count, Pool
 from json import dump
+from itertools import product
 
 
-def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, seed, filePath, directoryName):
+def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, seed, filePath, directoryName):
+    env.setCacheAlgorithm(cacheAlgorithm)
     env.setXPatternFeature(xPatternFeature)
     env.setNPattern(nPattern)
     env.setLearningRate(learningRate)
     env.setMaxSizeOfTransientMemory(maxSizeOfTransientMemory)
+    env.setMaintenaceCostOfTransientMemory(maintenanceCostOfTransientMemory)
     env.setSeed(seed)
+    env.setWeightModel() # must always be the last thing to be called!
     start = time.time()
     # Generate datasets
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
@@ -78,6 +83,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, xPatternF
             'weights_initialised_as': str(env.WEIGHTS_INITIALISED_AS),
             'cache_algorithm': str(env.CACHE_ALGORITHM),
             'max_size_of_transient_memory': str(maxSizeOfTransientMemory),
+            'maintenance_cost_of_transient_memory': str(maintenanceCostOfTransientMemory),
 
         }
     }
@@ -128,37 +134,25 @@ if __name__ == "__main__":  # If main function
         simulationNumber = 0
         totalSimulations = nXPatternFeaturesAboveNPatterns * \
             len(env.LEARNING_RATES) * \
-            len(env.MAX_SIZES_OF_TRANSIENT_MEMORY) * len(env.SEEDS)
+            len(env.MAX_SIZES_OF_TRANSIENT_MEMORY) * \
+            len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY) * \
+            len(env.CACHE_ALGORITHMS) *  len(env.SEEDS)
         print("Simulation "+str(simulationNumber)+" of "+str(totalSimulations))
 
         # Loop through all possible global settings.
+        
         simulationTypeNumber = 0  # Allows for averaging of seeds
-
-        for xPatternFeature in env.X_PATTERN_FEATURES:
-            if(env.VERBOSE):
-                print("xPattern = "+str(xPatternFeature))
-            for nPattern in env.N_PATTERNS:
-                if(
-                    ((nPattern != xPatternFeature) & env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES) or
-                    (nPattern == 0)
-                ):  # Avoid dividing by zero error by ensuring <
-                    continue
-                if(env.VERBOSE):
-                    print("nPattern = "+str(nPattern))
-                for learningRate in env.LEARNING_RATES:
-                    if(env.VERBOSE):
-                        print("learningRate = "+str(learningRate))
-                    for maxSizeOfTransientMemory in env.MAX_SIZES_OF_TRANSIENT_MEMORY:
-                        if(env.VERBOSE):
-                            print("maxSizeOfTransientMemory = " +
-                                  str(maxSizeOfTransientMemory))
-                        simulationTypeNumber += 1
-                        for seed in env.SEEDS:
-                            simulationNumber = simulationNumber + 1
-                            if(env.VERBOSE):
-                                print("seed = "+str(seed))
-                            result = pool.apply_async(simulate, args=(
-                                simulationNumber, simulationTypeNumber, totalSimulations, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, seed, filePath, directoryName))
+        allSimulations = product(env.CACHE_ALGORITHMS, env.X_PATTERN_FEATURES, env.N_PATTERNS,
+                                 env.LEARNING_RATES, env.MAX_SIZES_OF_TRANSIENT_MEMORY, env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY)
+        
+        for cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory in \
+            allSimulations:
+            simulationTypeNumber += 1
+            for seed in env.SEEDS:
+                simulationNumber += 1
+                #TODO: Print status when verbose == true
+                result = pool.apply_async(simulate, args=(
+                    simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, seed, filePath, directoryName))
 
         pool.close()
         pool.join()

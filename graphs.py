@@ -95,3 +95,32 @@ def makeFigure2b(directoryName):
     plt.legend()
     fig.savefig(directoryName+"/figure2b.png", dpi=300)  # save figure
     return fig
+
+def makeFigure4b(directoryName):
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
+                       usecols=[2, 3, 10, 15, 17, 18, 33]).dropna()
+    data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
+        'maintenance_cost_of_transient_memory').groupby('simulationTypeNumber')
+    means = data[list(['maintenance_cost_of_transient_memory',
+                       'Simulated: energy actually used by learning',
+                       'Energy expended by simulations for consolidations',
+                       'Energy expended by simulations for maintenance'])
+                 ].mean(numeric_only=True).sort_values('maintenance_cost_of_transient_memory')
+
+    y1 = means['Theoretical: random-walk efficiency'].to_numpy()
+    y2 = means['Simulated: efficiency (m_perc/m_min)'].to_numpy()
+    y1Min = y1.min() if y1.min() > 0 else 0
+    y1Max = y1.max()
+    x = means['n_pattern'].to_numpy() / means['n_pattern_features'].to_numpy()
+    # Setting the figure size and resolution
+    fig = plt.figure(figsize=(10, 6), dpi=300)
+    plt.plot(x, y1, color="blue",  linewidth=1, linestyle="-")
+    plt.plot(x, y2, color="black",  linewidth=1, linestyle="-")
+    plt.yscale('log')
+    # Setting the boundaries of the figure
+    plt.xlim(0, 2)
+    #plt.ylim(10**3, 10**9)
+    plt.xlabel('number of patterns / number of synapses')  # add x-label
+    plt.ylabel('Inefficiency')  # add y-label
+    fig.savefig(directoryName+"/figure1d.png", dpi=300)  # save figure
+    return fig

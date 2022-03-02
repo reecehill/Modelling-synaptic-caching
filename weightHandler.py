@@ -97,12 +97,10 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
             # Get the indexes of weights that have exceeded their memory limit.
             indexesOfWeightsAboveThreshold = np.where(
                 abs(newWeightsAtTimeT[:, memoryTypeId]) >= abs(memoryType['memory_size']))[0]
-
-            # If one or more synapse(s) has met the threshold for the memory type...
-            if(len(indexesOfWeightsAboveThreshold) > 0):
-                
-                
-                if(env.CACHE_ALGORITHM == 'local-local'): # Only consolidate individual synapses that have met threshold.
+            
+            
+            if(env.CACHE_ALGORITHM == 'local-local'):  # Only consolidate individual synapses that have met threshold.
+                if(len(indexesOfWeightsAboveThreshold) > 0):
                     # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
                     consolidationsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId -
                                         1] = newWeightsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId]
@@ -110,8 +108,12 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
                     newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
                     # Reset values to zero if consolidated.
                     newWeightsAtTimeT[indexesOfWeightsAboveThreshold, memoryTypeId] = 0
+                else:
+                    # Caching algorithm is set to local-local, but thresholds are not met locally. So do not consolidate yet
+                    continue
 
-                elif(env.CACHE_ALGORITHM == 'local-global'): # Consolidate all synapses as one synapse has hit threshold.
+            elif(env.CACHE_ALGORITHM == 'local-global'): # Consolidate all synapses once one synapse has hit threshold.
+                if(len(indexesOfWeightsAboveThreshold) > 0):
                     # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
                     consolidationsAtTimeT[:, memoryTypeId -
                                           1] = newWeightsAtTimeT[:, memoryTypeId]
@@ -119,10 +121,13 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
                     newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
                     # Reset all values for memory type to zero as they have been consolidated.
                     newWeightsAtTimeT[:, memoryTypeId] = 0
-                
-                elif(env.CACHE_ALGORITHM == 'global-global'):
-                    if(len(indexesOfWeightsAboveThreshold) == len(newWeightsAtTimeT[:, memoryTypeId])):
-                        # All values of this memory type have exceeded their threshold.
+                else:
+                    # Caching algorithm is set to local-global, but thresholds are not met locally. So do not consolidate yet
+                    continue
+
+            elif(env.CACHE_ALGORITHM == 'global-global'):
+                if(np.sum(abs(newWeightsAtTimeT[:, memoryTypeId])) >= abs(memoryType['memory_size'])):
+                        # The sum of the values of this memory type have exceeded their threshold.
 
                         # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
                         consolidationsAtTimeT[:, memoryTypeId - 1] = newWeightsAtTimeT[:, memoryTypeId]
@@ -130,11 +135,11 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
                         newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
                         # Reset all values for memory type to zero as they have been consolidated.
                         newWeightsAtTimeT[:, memoryTypeId] = 0
-                    else:
-                        # Caching algorithm is set to global-global, but thresholds are not met globally. So do not consolidate yet
-                        continue
                 else:
-                    raise ValueError('Incorrect CACHING_ALGORITHM specified. Please refer to the comments in parameters.py')
+                    # Caching algorithm is set to global-global, but thresholds are not met globally. So do not consolidate yet
+                    continue
+            else:
+                raise ValueError('Incorrect CACHING_ALGORITHM specified. Please refer to the comments in parameters.py')
 
     return newWeightsAtTimeT, consolidationsAtTimeT
 

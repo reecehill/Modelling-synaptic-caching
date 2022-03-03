@@ -47,7 +47,10 @@ MAX_SIZES_OF_TRANSIENT_MEMORY = [0.05]
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
-MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = linspace(0.001,0.1,200)
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = []
+
+# insert comments for  DECAY_TAUS_OF_TRANSIENT_MEMORY
+DECAY_TAUS_OF_TRANSIENT_MEMORY = linspace(0, 0.004, 100)
 
 # *-*-*-*-*-*-
 # !! STOP !!
@@ -158,7 +161,7 @@ def generateWeightModel():
             1: {
                 'name': 'transient',
                 'memory_size': MAX_SIZE_OF_TRANSIENT_MEMORY,
-                'decay_tau': 0.002,  # amount memory decays per time step
+                'decay_tau': DECAY_TAU_OF_TRANSIENT_MEMORY,  # amount memory decays per time step
                 'cost_of_maintenance': MAINTENANCE_COST_OF_TRANSIENT_MEMORY,
                 # The highest memory type does not receive weights for consolidation.
                 'cost_of_consolidation': 0

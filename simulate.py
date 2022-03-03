@@ -88,10 +88,14 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'Simulated: efficiency (m_perc/m_min)': str(efficiency),
             'Simulated-Theoretical efficiency difference': str(round((efficiency - theoreticalEfficiency), 3)),
             'Theoretical: minimum energy for learning': str(theoreticalMinimumEnergy),
+           
             'Simulated: energy actually used by learning': str(metabolicEnergy),
-            'Simulated-Theoretical min difference for learning': str(round((metabolicEnergy - theoreticalMinimumEnergy), 3)),
+           
+           # 'Simulated-Theoretical min difference for learning': str(round((metabolicEnergy - theoreticalMinimumEnergy), 3)),
+           
             'Energy expended by simulations for consolidations': str(consolidationEnergy),
             'Energy expended by simulations for maintenance': str(maintenanceEnergy),
+           
             'Energy expended total': str(round((consolidationEnergy + maintenanceEnergy), 3)),
             '(seen) NLL': str(trainNLL)+'%',
             '(seen) Accuracy': str(trainAccuracy)+'%',

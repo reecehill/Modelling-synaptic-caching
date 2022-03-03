@@ -29,7 +29,7 @@ def prepareWeights(trainingDatasetX):
     # weight_(N_WEIGHTS) = [ value_consolidated, value_transient ]
     nMemoryTypes = len(env.WEIGHT_MEMORY_TYPES)
 
-    weightsByTime = np.empty((env.MAX_EPOCHS, env.N_WEIGHTS, nMemoryTypes))
+    weightsByTime = np.zeros((env.MAX_EPOCHS, env.N_WEIGHTS, nMemoryTypes))
     initialWeights = np.empty((0, nMemoryTypes))
     # Use template model of weights (see parameters.py) to create new matrix of random weights
     for neuroneTypeName, neuroneTypeData in env.WEIGHT_MODEL.items():

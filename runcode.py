@@ -48,6 +48,8 @@ if __name__ == "__main__":  # If main function
     else:
         directoryName = conf.RUN_SIMULATION
     
+
+
     print("Now producing graphs...")
     # If only the N_PATTERNS and X_PATTERN_FEATURES are varied... 
     if(( (env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES != True) & \
@@ -66,6 +68,10 @@ if __name__ == "__main__":  # If main function
 
     # TODO: Limit making this graph unless parameters are tried for.
     g.makeFigure2c(directoryName)
+
+
+    # TODO: Limit making this graph unless parameters are correctly fixed and varied.
+
 
     if(s.TOTAL_SIMULATIONS == (len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY) * len(env.SEEDS))):
         fig4b = g.makeFigure4b(directoryName)

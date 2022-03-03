@@ -10,7 +10,6 @@ def validateParameters():
   global X_PATTERN_FEATURE
   print("Skipped validation of parameters (learning)...")
 
-
 def getDatasets():
   def generateDataset():
     # -- GENERATE DATASET

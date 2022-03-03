@@ -59,7 +59,7 @@ def makeFigure1d(directoryName):
     #plt.ylim(10**3, 10**9)
     plt.xlabel('number of patterns / number of synapses')  # add x-label
     plt.ylabel('Inefficiency')  # add y-label
-    fig.savefig(directoryName+"/figure1d.png", dpi=300)  # save figure
+    fig.savefig(directoryName+"/figure1d.png", dpi=125)  # save figure
     return fig
 
 
@@ -74,7 +74,7 @@ def makeFigure2b(directoryName):
                        'Energy expended by simulations for maintenance'])
                  ].mean(numeric_only=True).sort_values('max_size_of_transient_memory')
 
-    
+
     y_consolidations = means['Energy expended by simulations for consolidations'].to_numpy()
     y_maintenance = means['Energy expended by simulations for maintenance'].to_numpy()
     y_total = y_maintenance + y_consolidations
@@ -92,7 +92,7 @@ def makeFigure2b(directoryName):
     plt.xlabel('Consolidation threshold')  # add x-label
     plt.ylabel('Energy used (a.u.)')  # add y-label
     plt.legend()
-    fig.savefig(directoryName+"/figure2b.png", dpi=300)  # save figure
+    fig.savefig(directoryName+"/figure2b.png", dpi=125)  # save figure
     return fig
 
 def makeFigure2c(directoryName):
@@ -107,7 +107,7 @@ def makeFigure2c(directoryName):
     y1 = means['Optimal threshold'].to_numpy()
     x = means['maintenance_cost_of_transient_memory'].to_numpy()
     # Setting the figure size and resolution
-    fig = plt.figure(figsize=(10, 6), dpi=300)
+    fig = plt.figure(figsize=(10, 6), dpi=125)
     plt.step(x, y1,  linewidth=1, linestyle="-")
 
     # Setting the boundaries of the figure
@@ -115,19 +115,31 @@ def makeFigure2c(directoryName):
     #plt.ylim(10**3, 10**9)
     plt.xlabel('Cost of transient plasticity')  # add x-label
     plt.ylabel('Optimal threshold')  # add y-label
-    fig.savefig(directoryName+"/figure2c.png", dpi=300)  # save figure
+    fig.savefig(directoryName+"/figure2c.png", dpi=125)  # save figure
     return fig
 
+def makeFigure3(directoryName):
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
+                       ).dropna()
+    data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
+        'simulationTypeNumber').groupby('simulationTypeNumber')
+
+    list[key]
+
+    means = data[list(['Energy expended total',
+                       'maintenance_cost_of_transient_memory'])
+                 ].mean(numeric_only=True).sort_values('maintenance_cost_of_transient_memory')
+
 def makeFigure4b(directoryName):
-    # Figure 4b does not work because the ideal consolidation thresholds must be calculated for each cache algorithm and maintenance cost. 
+    # Figure 4b does not work because the ideal consolidation thresholds must be calculated for each cache algorithm and maintenance cost.
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
                        usecols=[2, 3, 10, 15, 17, 18, 31, 33]).dropna()
-    
+
     usedCacheAlgorithms = data['cache_algorithm'].unique()
     # Setting the figure size and resolution
-    fig = plt.figure(figsize=(10, 6), dpi=300)
+    fig = plt.figure(figsize=(10, 6), dpi=125)
 
-    
+
     for cacheAlgorithm in usedCacheAlgorithms:
         groupedData = data.where(data['Learning was complete at epoch #'] != False)\
             .where(data['cache_algorithm'] == cacheAlgorithm).groupby('simulationTypeNumber')

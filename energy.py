@@ -39,13 +39,7 @@ def calculateEnergyFromMaintenance(weightsByEpoch):
   summedWeightsForAllTimesAndMemoryTypes = np.sum(
       summedWeightsForAllTimes, axis=1)
   
-
-# TODO: Refactor this loop.
-  energyConstantsByMemoryType = []
-  for memoryTypeId, memoryTypeData in env.WEIGHT_MEMORY_TYPES.items():
-    if(memoryTypeData['cost_of_maintenance'] == None):
-      continue
-    energyConstantsByMemoryType.append(memoryTypeData['cost_of_maintenance'])
+  energyConstantsByMemoryType = np.asarray([x['cost_of_maintenance'] for x in env.WEIGHT_MEMORY_TYPES.values()])
   
   # c * ∑_i( ∑_t|s_i(t)|) )
   energyConsumedByMaintenance = np.multiply(
@@ -93,6 +87,8 @@ def calculateOptimalThreshold(epochIndexForConvergence):
   # TODO: Tidy this up.
   c = env.WEIGHT_MEMORY_TYPES[list(env.WEIGHT_MEMORY_TYPES)[-1]]['cost_of_maintenance']
   T = epochIndexForConvergence
-  K = (2*P)/((2-(P/N))**2)
+
+
+  K = (2*P)/((2-(P/N))**2) #Numerically found
 
   return (env.LEARNING_RATE**2) * ( (3*K) / (1+c*T) )

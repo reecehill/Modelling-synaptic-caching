@@ -6,20 +6,20 @@ LEARNING_RATES = [0.8]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [200]
+X_PATTERN_FEATURES = [100]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [200]
+N_PATTERNS = [100]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 3000
+MAX_EPOCHS = 500
 
 ENERGY_EXPONENT = 1
 
@@ -43,11 +43,11 @@ PRESET_SIMULATION = 1
 CACHE_ALGORITHMS = ['local-global']
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = ['0.5']
+MAX_SIZES_OF_TRANSIENT_MEMORY = [0.05]
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
-MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = linspace(0, 0.1, 50)
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = linspace(0.001,0.1,200)
 
 # *-*-*-*-*-*-
 # !! STOP !!

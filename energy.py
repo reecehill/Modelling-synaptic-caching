@@ -90,8 +90,9 @@ def calculateOptimalThreshold(epochIndexForConvergence):
   P = env.N_PATTERN
   N = env.X_PATTERN_FEATURE
   # For this, we assume that the last memory type is transient memory!
-  c = env.WEIGHT_MEMORY_TYPES[-1]['cost_of_maintenance']
+  # TODO: Tidy this up.
+  c = env.WEIGHT_MEMORY_TYPES[list(env.WEIGHT_MEMORY_TYPES)[-1]]['cost_of_maintenance']
   T = epochIndexForConvergence
   K = (2*P)/((2-(P/N))**2)
 
-  return (env.LEARNING_RATE**2) * ( (3*K) / (1+cT) )
+  return (env.LEARNING_RATE**2) * ( (3*K) / (1+c*T) )

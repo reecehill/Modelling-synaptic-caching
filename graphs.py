@@ -95,6 +95,29 @@ def makeFigure2b(directoryName):
     fig.savefig(directoryName+"/figure2b.png", dpi=300)  # save figure
     return fig
 
+def makeFigure2c(directoryName):
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
+                       ).dropna()
+    data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
+        'simulationTypeNumber').groupby('simulationTypeNumber')
+    means = data[list(['Optimal threshold',
+                       'maintenance_cost_of_transient_memory'])
+                 ].mean(numeric_only=True).sort_values('maintenance_cost_of_transient_memory')
+
+    y1 = means['Optimal threshold'].to_numpy()
+    x = means['maintenance_cost_of_transient_memory'].to_numpy()
+    # Setting the figure size and resolution
+    fig = plt.figure(figsize=(10, 6), dpi=300)
+    plt.step(x, y1,  linewidth=1, linestyle="-")
+
+    # Setting the boundaries of the figure
+    plt.xlim(0, 0.1)
+    #plt.ylim(10**3, 10**9)
+    plt.xlabel('Cost of transient plasticity')  # add x-label
+    plt.ylabel('Optimal threshold')  # add y-label
+    fig.savefig(directoryName+"/figure2c.png", dpi=300)  # save figure
+    return fig
+
 def makeFigure4b(directoryName):
     # Figure 4b does not work because the ideal consolidation thresholds must be calculated for each cache algorithm and maintenance cost. 
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],

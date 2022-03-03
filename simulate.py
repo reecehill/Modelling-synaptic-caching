@@ -70,7 +70,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         weightsByEpoch)
     consolidationEnergy = e.calculateEnergyFromConsolidations(
         consolidationsByEpoch)
-
+    optimalThreshold = e.calculateOptimalThreshold(epochIndexForConvergence)
     report = {
         simulationNumber:
         {
@@ -107,7 +107,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'cache_algorithm': str(env.CACHE_ALGORITHM),
             'max_size_of_transient_memory': str(maxSizeOfTransientMemory),
             'maintenance_cost_of_transient_memory': str(maintenanceCostOfTransientMemory),
-
+            'Optimal threshold': str(optimalThreshold),
         }
     }
 

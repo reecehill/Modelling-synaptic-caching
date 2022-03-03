@@ -1,18 +1,18 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+SEEDS = [0, 1]
 
 LEARNING_RATES = [0.8]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [400]
+X_PATTERN_FEATURES = [200]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [400]
+N_PATTERNS = [200]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
@@ -43,11 +43,11 @@ PRESET_SIMULATION = 1
 CACHE_ALGORITHMS = ['local-global']
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0.001, 40, 100)
+MAX_SIZES_OF_TRANSIENT_MEMORY = ['0.5']
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
-MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = [0.1]
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = linspace(0, 0.1, 50)
 
 # *-*-*-*-*-*-
 # !! STOP !!

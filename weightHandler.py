@@ -93,7 +93,7 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
 
             # Get the indexes of weights that have exceeded their memory limit.
             indexesOfWeightsAboveThreshold = np.where(
-                abs(newWeightsAtTimeT[:, memoryTypeId]) >= abs(memoryType['memory_size']))[0]
+                np.abs(newWeightsAtTimeT[:, memoryTypeId]) >= np.abs(memoryType['memory_size']))[0]
             
             
             if(env.CACHE_ALGORITHM == 'local-local'):  # Only consolidate individual synapses that have met threshold.

@@ -121,14 +121,34 @@ def makeFigure2c(directoryName):
 def makeFigure3(directoryName):
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
                        ).dropna()
-    data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
-        'simulationTypeNumber').groupby('simulationTypeNumber')
 
-    list[key]
+    usedCostsOfTransientMemory = data['maintenance_cost_of_transient_memory'].unique()
+    fig = plt.figure(figsize=(10, 6), dpi=125)
 
-    means = data[list(['Energy expended total',
-                       'maintenance_cost_of_transient_memory'])
-                 ].mean(numeric_only=True).sort_values('maintenance_cost_of_transient_memory')
+    for costOfTransientMemory in usedCostsOfTransientMemory:
+            groupedData = data.where(data['Learning was complete at epoch #'] != False)\
+            .where(data['maintenance_cost_of_transient_memory'] == costOfTransientMemory).groupby('simulationTypeNumber')
+
+            means = groupedData[list(['Energy expended total',
+                            'Decay rate of transient memory',])
+                        ].mean(numeric_only=True).sort_values('Decay rate of transient memory')
+
+            x = means['Decay rate of transient memory'].to_numpy()
+            y = means['Energy expended total'].to_numpy()
+
+            plt.plot(x, y, linewidth=1, linestyle="-", label='c='+str(costOfTransientMemory))
+
+    #plt.yscale('log')
+    # Setting the boundaries of the figure
+    #plt.xlim(0, 0.004)
+    #plt.ylim(10**3, 10**9)
+    plt.xlabel('Decay rate')  # add x-label
+    plt.ylabel('Energy')  # add y-label
+    plt.legend()
+    fig.savefig(directoryName+"/figure3a.png", dpi=125)  # save figure
+    return fig
+    
+
 
 def makeFigure4b(directoryName):
     # Figure 4b does not work because the ideal consolidation thresholds must be calculated for each cache algorithm and maintenance cost.
@@ -138,7 +158,6 @@ def makeFigure4b(directoryName):
     usedCacheAlgorithms = data['cache_algorithm'].unique()
     # Setting the figure size and resolution
     fig = plt.figure(figsize=(10, 6), dpi=125)
-
 
     for cacheAlgorithm in usedCacheAlgorithms:
         groupedData = data.where(data['Learning was complete at epoch #'] != False)\

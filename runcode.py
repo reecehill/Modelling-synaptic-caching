@@ -1,5 +1,6 @@
 import system_configuration as conf
 
+
 # Get the parameters either from main parameters.py, or from a previous simulation 
 if(conf.RUN_SIMULATION == True):
     import parameters as env
@@ -33,13 +34,15 @@ if __name__ == "__main__":  # If main function
         simulationTypeNumber = 0  # Allows for averaging of seeds
         print("Simulation "+str(simulationNumber)+" of "+str(s.TOTAL_SIMULATIONS))
 
-        for cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory in allSimulations:
-            simulationTypeNumber += 1
+        for cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, decayTauOfTransientMemory in allSimulations:
+            
+            simulationTypeNumber = simulationTypeNumber + 1
             for seed in env.SEEDS:
-                simulationNumber += 1
+                simulationNumber = simulationNumber + 1
                 #TODO: Print status when verbose == true
+
                 result = pool.apply_async(s.simulate, args=(
-                    simulationNumber, simulationTypeNumber, s.TOTAL_SIMULATIONS, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, seed, filePath, directoryName))
+                    simulationNumber, simulationTypeNumber, s.TOTAL_SIMULATIONS, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, decayTauOfTransientMemory, seed, filePath, directoryName))
         pool.close()
         pool.join()
         print("A csv file has been produced and is available at: (location of this script)/"+str(filePath))
@@ -72,6 +75,10 @@ if __name__ == "__main__":  # If main function
 
     # TODO: Limit making this graph unless parameters are correctly fixed and varied.
 
+    if(s.TOTAL_SIMULATIONS == (len(env.DECAY_TAUS_OF_TRANSIENT_MEMORY)*len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY)*len(env.SEEDS))):
+        fig3 = g.makeFigure3(directoryName)
+    else:
+        print("Skipped producing Figure 3.")
 
     if(s.TOTAL_SIMULATIONS == (len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY) * len(env.SEEDS))):
         fig4b = g.makeFigure4b(directoryName)

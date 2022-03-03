@@ -36,14 +36,14 @@ def calculateEnergyFromMaintenance(weightsByEpoch):
   summedWeightsForAllTimes = np.sum(np.abs(weightsByEpoch), axis=1)  
   
   #∑_i( ∑_t|s_i(t)|) )
-  summedWeightsForAllTimesAndMemoryTypes = np.sum(
+  summedWeightsForAllTimesByMemoryType = np.sum(
       summedWeightsForAllTimes, axis=1)
   
   energyConstantsByMemoryType = np.asarray([x['cost_of_maintenance'] for x in env.WEIGHT_MEMORY_TYPES.values()])
   
   # c * ∑_i( ∑_t|s_i(t)|) )
   energyConsumedByMaintenance = np.multiply(
-      summedWeightsForAllTimesAndMemoryTypes, energyConstantsByMemoryType)
+      summedWeightsForAllTimesByMemoryType, energyConstantsByMemoryType)
   return round(np.sum(energyConsumedByMaintenance), 3)
 
 
@@ -80,14 +80,14 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
   summedConsolidationEnergy = np.sum(consolidationEnergyByMemoryType)
   return round(summedConsolidationEnergy, 3)
 
-def calculateOptimalThreshold(epochIndexForConvergence):
+def calculateOptimalThreshold():
   P = env.N_PATTERN
   N = env.X_PATTERN_FEATURE
   # For this, we assume that the last memory type is transient memory!
   # TODO: Tidy this up.
   c = env.WEIGHT_MEMORY_TYPES[list(env.WEIGHT_MEMORY_TYPES)[-1]]['cost_of_maintenance']
-  T = epochIndexForConvergence
-
+  #T = epochIndexForConvergence
+  T = (P**(3/2)) / ((2-(P/N))**2)
 
   K = (2*P)/((2-(P/N))**2) #Numerically found
 

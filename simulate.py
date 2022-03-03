@@ -30,21 +30,31 @@ def getAllSimulationPossibilities():
 
     # Returns a list of all possible permutations of the parameters for looping later.
     allSimulations = list(product(env.CACHE_ALGORITHMS, env.X_PATTERN_FEATURES, env.N_PATTERNS,
-                                  env.LEARNING_RATES, env.MAX_SIZES_OF_TRANSIENT_MEMORY, env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY))
+                                  env.LEARNING_RATES, env.MAX_SIZES_OF_TRANSIENT_MEMORY, env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY,
+                                  env.DECAY_TAUS_OF_TRANSIENT_MEMORY))
     TOTAL_SIMULATIONS = len(allSimulations) * len(env.SEEDS)
     return allSimulations
 
 
-def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, seed, filePath, directoryName):
+def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, decayTauOfTransientMemory, seed, filePath, directoryName):
+    
     env.setCacheAlgorithm(cacheAlgorithm)
     env.setXPatternFeature(xPatternFeature)
     env.setNPattern(nPattern)
     env.setLearningRate(learningRate)
-    env.setMaxSizeOfTransientMemory(maxSizeOfTransientMemory)
     env.setMaintenaceCostOfTransientMemory(maintenanceCostOfTransientMemory)
+    env.setDecayTauOfTransientMemory(decayTauOfTransientMemory)
+    env.setMaxSizeOfTransientMemory(maxSizeOfTransientMemory)
     env.setSeed(seed)
     env.setWeightModel()  # must always be the last thing to be called!
+
+    #TODO: Refactor this so it doesnt have to rerun. If max_sizes is empty, find the optimal.
+    if(env.MAX_SIZES_OF_TRANSIENT_MEMORY[0] == 0):
+        env.MAX_SIZE_OF_TRANSIENT_MEMORY = e.calculateOptimalThreshold()
+        env.setMaxSizeOfTransientMemory(env.MAX_SIZE_OF_TRANSIENT_MEMORY)
+        env.setWeightModel()
     start = time.time()
+    
     # Generate datasets
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 
@@ -70,7 +80,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         weightsByEpoch)
     consolidationEnergy = e.calculateEnergyFromConsolidations(
         consolidationsByEpoch)
-    optimalThreshold = e.calculateOptimalThreshold(epochIndexForConvergence)
+    optimalThreshold = e.calculateOptimalThreshold()
     report = {
         simulationNumber:
         {
@@ -88,14 +98,9 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'Simulated: efficiency (m_perc/m_min)': str(efficiency),
             'Simulated-Theoretical efficiency difference': str(round((efficiency - theoreticalEfficiency), 3)),
             'Theoretical: minimum energy for learning': str(theoreticalMinimumEnergy),
-           
-            'Simulated: energy actually used by learning': str(metabolicEnergy),
-           
-           # 'Simulated-Theoretical min difference for learning': str(round((metabolicEnergy - theoreticalMinimumEnergy), 3)),
-           
-            'Energy expended by simulations for consolidations': str(consolidationEnergy),
+            'Simulated: energy actually used by learning': str(metabolicEnergy), # Energy used hypothetically with no caching
+            'Energy expended by simulations for consolidations': str(consolidationEnergy), 
             'Energy expended by simulations for maintenance': str(maintenanceEnergy),
-           
             'Energy expended total': str(round((consolidationEnergy + maintenanceEnergy), 3)),
             '(seen) NLL': str(trainNLL)+'%',
             '(seen) Accuracy': str(trainAccuracy)+'%',
@@ -112,6 +117,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'max_size_of_transient_memory': str(maxSizeOfTransientMemory),
             'maintenance_cost_of_transient_memory': str(maintenanceCostOfTransientMemory),
             'Optimal threshold': str(optimalThreshold),
+            'Decay rate of transient memory': str(decayTauOfTransientMemory)
         }
     }
 

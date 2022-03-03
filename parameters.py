@@ -1,8 +1,8 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = [0, 1]
+SEEDS = list(range(0,5))
 
-LEARNING_RATES = [0.8]
+LEARNING_RATES = [0.1]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
@@ -19,7 +19,7 @@ N_PATTERNS = [100]
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 500
+MAX_EPOCHS = 2000
 
 ENERGY_EXPONENT = 1
 
@@ -43,14 +43,17 @@ PRESET_SIMULATION = 1
 CACHE_ALGORITHMS = ['local-global']
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
-MAX_SIZES_OF_TRANSIENT_MEMORY = [0.05]
+# Accepts:
+# - List of values to set
+# [0]: to find the optimal threshold.
+MAX_SIZES_OF_TRANSIENT_MEMORY = [0]
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
-MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = []
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = [0, 0.0001, 0.001, 0.01]
 
 # insert comments for  DECAY_TAUS_OF_TRANSIENT_MEMORY
-DECAY_TAUS_OF_TRANSIENT_MEMORY = linspace(0, 0.004, 100)
+DECAY_TAUS_OF_TRANSIENT_MEMORY = linspace(0, 0.004, 10)
 
 # *-*-*-*-*-*-
 # !! STOP !!
@@ -91,6 +94,9 @@ def setMaintenaceCostOfTransientMemory(maintenanceCostOfTransientMemory):
     global MAINTENANCE_COST_OF_TRANSIENT_MEMORY
     MAINTENANCE_COST_OF_TRANSIENT_MEMORY = maintenanceCostOfTransientMemory
 
+def setDecayTauOfTransientMemory(decayTauOfTransientMemory):
+    global DECAY_TAU_OF_TRANSIENT_MEMORY
+    DECAY_TAU_OF_TRANSIENT_MEMORY = decayTauOfTransientMemory
 
 def setNPattern(nPattern):
     global N_PATTERN
@@ -154,9 +160,9 @@ def generateWeightModel():
             0: {
                 'name': 'consolidated',
                 'memory_size': False,
-                'decay_tau': 0,  # amount memory decays per time step
+                'decay_tau': '0',
                 'cost_of_maintenance': 0,
-                'cost_of_consolidation': 0.1,
+                'cost_of_consolidation': 1,
             },
             1: {
                 'name': 'transient',

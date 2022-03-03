@@ -53,6 +53,8 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         env.MAX_SIZE_OF_TRANSIENT_MEMORY = e.calculateOptimalThreshold()
         env.setMaxSizeOfTransientMemory(env.MAX_SIZE_OF_TRANSIENT_MEMORY)
         env.setWeightModel()
+
+        
     start = time.time()
     
     # Generate datasets

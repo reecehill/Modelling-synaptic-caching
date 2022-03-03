@@ -1,6 +1,6 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = list(range(0,5))
+SEEDS = random.randint(low=0, high=10**2, size=5)
 
 LEARNING_RATES = [0.1]
 

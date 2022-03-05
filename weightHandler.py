@@ -135,15 +135,30 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
 
             elif(env.CACHE_ALGORITHM == 'local-global'): # Consolidate all synapses once one synapse has hit threshold.
                 if(len(indexesOfWeightsAboveThreshold) > 0):
-                    # Add changes to consolidationEvents matrix (which stores the amount each memory has changed by in this time step)
-                    consolidationsAtTimeT[:, memoryTypeId -
-                                          1] = newWeightsAtTimeT[:, memoryTypeId]
-                    # Submit consolidations
-                    newWeightsAtTimeT[:, memoryTypeId -
-                                      1] = newWeightsAtTimeT[:, memoryTypeId - 1] + \
-                                          consolidationsAtTimeT[:, memoryTypeId - 1]
-                    # Reset all values for memory type to zero as they have been consolidated.
-                    newWeightsAtTimeT[:, memoryTypeId] = 0
+                    negativeWeightIndices = np.where(newWeightsAtTimeT[:, memoryTypeId] < 0)[0]
+                    amountsFromThreshold = np.abs(newWeightsAtTimeT[:, memoryTypeId]) - np.abs(memoryType['memory_size'])
+                    amountsFromThreshold[negativeWeightIndices] = amountsFromThreshold[negativeWeightIndices] * -1
+
+                    if(env.ONLY_CONSOLIDATE_AMOUNT_ABOVE_THRESHOLD):
+                        # Add changes to consolidationEvents matrix (which stores the amount each memory has changed by in this time step)
+                        consolidationsAtTimeT[:, memoryTypeId -
+                                            1] = amountsFromThreshold
+                        # Submit consolidations
+                        newWeightsAtTimeT[:, memoryTypeId -
+                                          1] = newWeightsAtTimeT[:, memoryTypeId - 1] + amountsFromThreshold
+                        # Reset all values for memory type to the amount remaining after that which is above the threshold has been consolidated (i.e. reset to threshold level).
+                        newWeightsAtTimeT[:,
+                                          memoryTypeId] = newWeightsAtTimeT[:, memoryTypeId] - amountsFromThreshold
+                    else:
+                        # Add changes to consolidationEvents matrix (which stores the amount each memory has changed by in this time step)
+                        consolidationsAtTimeT[:, memoryTypeId -
+                                            1] = newWeightsAtTimeT[:, memoryTypeId]
+                        # Submit consolidations
+                        newWeightsAtTimeT[:, memoryTypeId -
+                                        1] = newWeightsAtTimeT[:, memoryTypeId - 1] + \
+                                            consolidationsAtTimeT[:, memoryTypeId - 1]
+                        # Reset all values for memory type to zero as they have been consolidated.
+                        newWeightsAtTimeT[:, memoryTypeId] = 0
                 else:
                     # Caching algorithm is set to local-global, but thresholds are not met locally. So do not consolidate yet
                     continue

@@ -1,12 +1,12 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = list(range(1,100))
+SEEDS = list(range(1, 5))
 
 LEARNING_RATES = [0.5]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [500]
+X_PATTERN_FEATURES = [200]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
@@ -19,7 +19,7 @@ N_PATTERNS = [200]
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 5000
+MAX_EPOCHS = 1000
 
 ENERGY_EXPONENT = 1
 
@@ -54,6 +54,9 @@ MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = [0.1]
 
 # insert comments for  DECAY_TAUS_OF_TRANSIENT_MEMORY
 DECAY_TAUS_OF_TRANSIENT_MEMORY = [0.002]
+
+# Only compatible with local-global cache algorithm!!
+ONLY_CONSOLIDATE_AMOUNT_ABOVE_THRESHOLD = False
 
 # *-*-*-*-*-*-
 # !! STOP !!

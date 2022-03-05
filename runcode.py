@@ -2,7 +2,7 @@ import system_configuration as conf
 
 
 # Get the parameters either from main parameters.py, or from a previous simulation 
-if(conf.RUN_SIMULATION == True):
+if(conf.RUN_SIMULATION is True):
     import parameters as env
 else:
     import importlib
@@ -19,7 +19,7 @@ from multiprocessing import cpu_count, Pool
 if __name__ == "__main__":  # If main function
     allSimulations = s.getAllSimulationPossibilities()
     # Process new simulation if requested,
-    if(conf.RUN_SIMULATION == True):
+    if(conf.RUN_SIMULATION is True):
         cpuCount = cpu_count()
         print("Number of cpu : ", cpuCount)
         pool = Pool(processes=int(cpuCount*(conf.PERCENTAGE_OF_CPU_CORES/100)))
@@ -39,7 +39,7 @@ if __name__ == "__main__":  # If main function
             simulationTypeNumber = simulationTypeNumber + 1
             for seed in env.SEEDS:
                 simulationNumber = simulationNumber + 1
-                #TODO: Print status when verbose == true
+                #TODO: Print status when verbose is True
 
                 result = pool.apply_async(s.simulate, args=(
                     simulationNumber, simulationTypeNumber, s.TOTAL_SIMULATIONS, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, decayTauOfTransientMemory, seed, filePath, directoryName))
@@ -55,10 +55,11 @@ if __name__ == "__main__":  # If main function
 
     print("Now producing graphs...")
     # If only the N_PATTERNS and X_PATTERN_FEATURES are varied... 
-    if(( (env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES != True) & \
-         (s.TOTAL_SIMULATIONS == (len(env.N_PATTERNS) * len(env.X_PATTERN_FEATURES) * len(env.SEEDS))) \
-         ) or \
-        ((env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES == True) & (s.TOTAL_SIMULATIONS == (len(s.COMMON_N_PATTERNS_X_PATTERN_FEATURES) * len(env.SEEDS))))):
+    if(((env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES is False) &
+        (s.TOTAL_SIMULATIONS == (len(env.N_PATTERNS) *
+         len(env.X_PATTERN_FEATURES) * len(env.SEEDS)))
+        ) or
+            ((env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES is True) & (s.TOTAL_SIMULATIONS == (len(s.COMMON_N_PATTERNS_X_PATTERN_FEATURES) * len(env.SEEDS))))):
         fig1c = g.makeFigure1c(directoryName)
         fig1d = g.makeFigure1d(directoryName)
     else:

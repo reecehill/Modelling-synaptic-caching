@@ -81,6 +81,23 @@ def prepareConsolidationEvents(weightsByTimeShape):
     consolidationsByTime = np.zeros(weightsByTimeShape)
     return consolidationsByTime
 
+def consolidateAllWeights(newWeightsAtTimeT, consolidationsAtTimeT):
+    # Called when learning has finished.
+    # Loop through the different neurones simulated (e.g. excitatory, inhibitory)
+    for neuroneTypeId, neuroneType in env.WEIGHT_NEURONE_TYPES.items():
+        # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
+        for memoryTypeId, memoryType in sorted(neuroneType['memoryTypes'].items(), reverse=True):
+            # Skip "consolidated" memory types (or memory types without limit)
+            if(memoryTypeId == 0 or memoryType['memory_size'] == False):
+                continue
+            # Add changes to consolidationEvents matrix (which stores the amount each memory will change by this in time step)
+            consolidationsAtTimeT[:, memoryTypeId -
+                                    1] = newWeightsAtTimeT[:, memoryTypeId]
+            # Submit consolidations
+            newWeightsAtTimeT = newWeightsAtTimeT + consolidationsAtTimeT
+            # Reset all values for memory type to zero as they have been consolidated.
+            newWeightsAtTimeT[:, memoryTypeId] = 0
+    return newWeightsAtTimeT, consolidationsAtTimeT
 
 def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
     # Loop through the different neurones simulated (e.g. excitatory, inhibitory)
@@ -139,7 +156,6 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
                 raise ValueError('Incorrect CACHING_ALGORITHM specified. Please refer to the comments in parameters.py')
 
     return newWeightsAtTimeT, consolidationsAtTimeT
-
 
 def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtTimeT):
     # TODO: this code will fail if weights are not defined as excitatory or inhibitory.

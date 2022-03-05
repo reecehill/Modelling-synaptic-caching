@@ -62,6 +62,8 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       weightsByTime[epochIndex+1] = w.updateNextWeights(weightsByTime[epochIndex])
     if(sum_mse == 0.0):
       # No weights were changed this epoch. Therefore, assume learning is complete and stop
+      weightsByTime[epochIndex], consolidationsByTime[epochIndex] = w.consolidateAllWeights(
+          weightsByTime[epochIndex], consolidationsByTime[epochIndex])
       epochIndexForConvergence = epochIndex
       break
     #print('->epochIndex=%d, lrate=%.3f, MSE=%f' %(epochIndex, env.LEARNING_RATE, (sum_mse/len(trainingDatasetX))))

@@ -6,8 +6,7 @@ def showFigures():
     plt.show()
 
 def makeFigure1c(directoryName):
-    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
-                       usecols=[2, 3, 5, 6, 10, 14, 15]).dropna()
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
     data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
         'simulationTypeNumber').groupby('simulationTypeNumber')
     means = data[list(['n_pattern', 'n_pattern_features',
@@ -35,8 +34,7 @@ def makeFigure1c(directoryName):
 
 
 def makeFigure1d(directoryName):
-    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
-                       usecols=[2, 3, 5, 6, 10, 11, 12]).dropna()
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
     data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
         'simulationTypeNumber').groupby('simulationTypeNumber')
     means = data[list(['n_pattern', 'n_pattern_features',
@@ -64,8 +62,7 @@ def makeFigure1d(directoryName):
 
 
 def makeFigure2b(directoryName):
-    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
-                       usecols=[2, 3, 10, 15, 17, 18, 32]).dropna()
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
     data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
         'max_size_of_transient_memory').groupby('simulationTypeNumber')
     means = data[list(['max_size_of_transient_memory',
@@ -152,8 +149,7 @@ def makeFigure3(directoryName):
 
 def makeFigure4b(directoryName):
     # Figure 4b does not work because the ideal consolidation thresholds must be calculated for each cache algorithm and maintenance cost.
-    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan'],
-                       usecols=[2, 3, 10, 15, 17, 18, 31, 33]).dropna()
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
 
     usedCacheAlgorithms = data['cache_algorithm'].unique()
     # Setting the figure size and resolution

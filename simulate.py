@@ -1,6 +1,6 @@
 import system_configuration as conf
 # Get the parameters either from main parameters.py, or from a previous simulation
-if(conf.RUN_SIMULATION == True):
+if(conf.RUN_SIMULATION is True):
     import parameters as env
 else:
     import importlib
@@ -49,7 +49,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
     env.setWeightModel()  # must always be the last thing to be called!
 
     #TODO: Refactor this so it doesnt have to rerun. If max_sizes is empty, find the optimal.
-    if(env.MAX_SIZES_OF_TRANSIENT_MEMORY[0] == 0):
+    if(env.MAX_SIZES_OF_TRANSIENT_MEMORY[0] == 'optimal'):
         env.MAX_SIZE_OF_TRANSIENT_MEMORY = e.calculateOptimalThreshold()
         env.setMaxSizeOfTransientMemory(env.MAX_SIZE_OF_TRANSIENT_MEMORY)
         env.setWeightModel()

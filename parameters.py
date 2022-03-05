@@ -1,29 +1,29 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = [0, 1, 2]
+SEEDS = [0,1,2]
 
-LEARNING_RATES = [0.8]
+LEARNING_RATES = [1]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [250]
+X_PATTERN_FEATURES = [200]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [250]
+N_PATTERNS = [200]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 1000
+MAX_EPOCHS = 5000
 
 ENERGY_EXPONENT = 1
 
-VERBOSE = False
+VERBOSE = True
 
 # WEIGHTS_INITIALISED_AS can be set to  one of the following strings:
 # 'zeros'
@@ -45,8 +45,8 @@ CACHE_ALGORITHMS = ['local-global']
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Accepts:
 # - List of values to set
-# [0]: to find the optimal threshold.
-MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0.001, 40, 100)
+# ['optimal']: to find the optimal threshold.
+MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0, 40, 40)
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
@@ -162,7 +162,7 @@ def generateWeightModel():
                 'memory_size': False,
                 'decay_tau': '0',
                 'cost_of_maintenance': 0,
-                'cost_of_consolidation': 1,
+                'cost_of_consolidation': 0.5,
             },
             1: {
                 'name': 'transient',

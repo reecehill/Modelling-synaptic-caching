@@ -34,7 +34,7 @@ def getDatasets():
 def predict(pattern, weightsAtTimeT):
   summedWeightsByType = w.getSummedWeightsByType(weightsAtTimeT)
   activation = np.dot(summedWeightsByType, pattern)
-  return [1] if activation >= 0.0 else [0]
+  return [1] if (activation > 0.0) else [0]
 
 # Estimate Perceptron weights using stochastic gradient descent
 def trainWeights(trainingDatasetX, trainingDatasetY):
@@ -42,9 +42,16 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       trainingDatasetX)
   consolidationsByTime = w.prepareConsolidationEvents(weightsByTime.shape)
   epochIndexForConvergence = False
-  for epochIndex in range(0, env.MAX_EPOCHS):
+  # Start from 1, so that initial weights are untouched.
+  for epochIndex in range(1, env.MAX_EPOCHS):
     sum_mse = 0.0
+    # Get current weights as a function of the previous weights (with/without decay)
+    weightsByTime[epochIndex] = w.updateNextWeights(weightsByTime[epochIndex-1])
+
+
     for patternIndex, pattern in enumerate(trainingDatasetX):
+
+      # Make predictions based on these new, decayed weights.
       prediction = predict(pattern, weightsByTime[epochIndex])
       error = trainingDatasetY[patternIndex] - prediction
       sum_mse += (error**2)
@@ -52,19 +59,17 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
       # TODO: for now, only the most transient weight type is added to with delta weight.
       deltaWeights = np.zeros(weightsByTime[epochIndex].shape)
       deltaWeights[:,-1] = env.LEARNING_RATE * (error * pattern)
+
+      # Override current weights according to prediction from decayed weights.
       weightsByTime[epochIndex], consolidationsByTime[epochIndex] = w.updateWeights(
           weightsByTime[epochIndex], deltaWeights, neuronalTypes, consolidationsByTime[epochIndex])
 
-    # Set the proceding weight timestep (so predictions are not made from zeros), either:
-    # ...to be equal to that of the current timestep (if memory does not decay) OR
-    # ...to be a function of exponential decay to zero (f memory decays)
-    if(epochIndex != env.MAX_EPOCHS-1):
-      weightsByTime[epochIndex+1] = w.updateNextWeights(weightsByTime[epochIndex])
     if(sum_mse == 0.0):
-      # No weights were changed this epoch. Therefore, assume learning is complete and stop
-      weightsByTime[epochIndex], consolidationsByTime[epochIndex] = w.consolidateAllWeights(
-          weightsByTime[epochIndex], consolidationsByTime[epochIndex])
-      epochIndexForConvergence = epochIndex
+      # No weights were changed this epoch. Therefore, assume learning is complete.
+      # We pass the current weights and next epoch's consolidations, 
+      weightsByTime[epochIndex+1], consolidationsByTime[epochIndex+1] = w.consolidateAllWeights(
+          weightsByTime[epochIndex], consolidationsByTime[epochIndex+1])
+      epochIndexForConvergence = epochIndex+1
       break
     #print('->epochIndex=%d, lrate=%.3f, MSE=%f' %(epochIndex, env.LEARNING_RATE, (sum_mse/len(trainingDatasetX))))
   return epochIndexForConvergence, weightsByTime, consolidationsByTime

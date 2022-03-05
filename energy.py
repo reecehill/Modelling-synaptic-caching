@@ -6,6 +6,8 @@ def validateParameters():
 
 
 def calculateTheoreticalMinimumEnergy(weightsByEpoch):
+  # Equation 2
+  # M_min = ∑i|wi(T)−wi(0)|
   return round(np.sum(abs(weightsByEpoch[-1] - weightsByEpoch[0])), 3)
 
 def calculateMetabolicEnergy(weightsByEpoch):
@@ -15,11 +17,11 @@ def calculateMetabolicEnergy(weightsByEpoch):
   return round(np.sum(abs(changeInWeightsPerTimeStep)**env.ENERGY_EXPONENT), 3)
 
 
-def calculateEfficiency(metabolicEnergy, theoreticalMinimumEnergy):
+def calculateSimulatedEfficiency(metabolicEnergy, theoreticalMinimumEnergy):
   return round((metabolicEnergy - theoreticalMinimumEnergy), 3)
 
 
-def calculateTheoreticalEfficiency():
+def calculateTheoreticalEfficiency():  # M_perc/M_min = πP/(2−P/N).
   K = 2*env.N_PATTERN/(2-env.N_PATTERN/env.X_PATTERN_FEATURE)**2
   m_perceptron = env.N_PATTERN * K * env.LEARNING_RATE
   m_minimum = ((2/np.pi)**(1/2))*env.LEARNING_RATE*(K**(1/2))
@@ -80,15 +82,26 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
   summedConsolidationEnergy = np.sum(consolidationEnergyByMemoryType)
   return round(summedConsolidationEnergy, 3)
 
-def calculateOptimalThreshold():
+def calculateTheoreticalOptimalThreshold():
   P = env.N_PATTERN
   N = env.X_PATTERN_FEATURE
   # For this, we assume that the last memory type is transient memory!
   # TODO: Tidy this up.
   c = env.WEIGHT_MEMORY_TYPES[list(env.WEIGHT_MEMORY_TYPES)[-1]]['cost_of_maintenance']
-  #T = epochIndexForConvergence
   T = (P**(3/2)) / ((2-(P/N))**2)
 
+  K = (2*P)/((2-(P/N))**2) #Numerically found
+
+  return np.sqrt((env.LEARNING_RATE**2) * ( (3*K) / (1+c*T) ))
+
+def calculateSimulatedOptimalThreshold(epochIndexForConvergence):
+  P = env.N_PATTERN
+  N = env.X_PATTERN_FEATURE
+  # For this, we assume that the last memory type is transient memory!
+  # TODO: Tidy this up.
+  c = env.WEIGHT_MEMORY_TYPES[list(env.WEIGHT_MEMORY_TYPES)[-1]]['cost_of_maintenance']
+  T = epochIndexForConvergence
+  
   K = (2*P)/((2-(P/N))**2) #Numerically found
 
   return (env.LEARNING_RATE**2) * ( (3*K) / (1+c*T) )

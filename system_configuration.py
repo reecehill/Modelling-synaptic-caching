@@ -6,4 +6,4 @@ PERCENTAGE_OF_CPU_CORES = 80
 
 # Set to True to run simulation and generate data.
 # Alternatively, set to directory name, relative to runcode.py file, that contains .csv file from previous simulations. Usually, this is a timestamp, eg. '20220224-224209'
-RUN_SIMULATION = True
+RUN_SIMULATION = '20220304-173957'

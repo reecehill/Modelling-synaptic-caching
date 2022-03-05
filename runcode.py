@@ -54,10 +54,10 @@ if __name__ == "__main__":  # If main function
 
 
     print("Now producing graphs...")
+
+    
     # If only the N_PATTERNS and X_PATTERN_FEATURES are varied... 
-    if(( (env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES != True) & \
-         (s.TOTAL_SIMULATIONS == (len(env.N_PATTERNS) * len(env.X_PATTERN_FEATURES) * len(env.SEEDS))) \
-         ) or \
+    if(( (env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES != True)) or \
         ((env.ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES == True) & (s.TOTAL_SIMULATIONS == (len(s.COMMON_N_PATTERNS_X_PATTERN_FEATURES) * len(env.SEEDS))))):
         fig1c = g.makeFigure1c(directoryName)
         fig1d = g.makeFigure1d(directoryName)
@@ -75,10 +75,13 @@ if __name__ == "__main__":  # If main function
 
     # TODO: Limit making this graph unless parameters are correctly fixed and varied.
 
+    
+    fig3a = g.makeFigure3a(directoryName)
+    
     if(s.TOTAL_SIMULATIONS == (len(env.DECAY_TAUS_OF_TRANSIENT_MEMORY)*len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY)*len(env.SEEDS))):
-        fig3 = g.makeFigure3(directoryName)
+        fig3b = g.makeFigure3b(directoryName)
     else:
-        print("Skipped producing Figure 3.")
+        print("Skipped producing Figure 3b.")
 
     if(s.TOTAL_SIMULATIONS == (len(env.MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY) * len(env.SEEDS))):
         fig4b = g.makeFigure4b(directoryName)

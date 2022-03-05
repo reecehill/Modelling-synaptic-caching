@@ -1,6 +1,6 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = list(range(1,100))
+SEEDS = list(range(1,50))
 
 LEARNING_RATES = [0.5]
 
@@ -12,7 +12,7 @@ X_PATTERN_FEATURES = [500]
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [200]
+N_PATTERNS = [500]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES

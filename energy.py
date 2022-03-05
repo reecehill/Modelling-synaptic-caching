@@ -53,20 +53,19 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
       consolidationsByEpoch)
 
   # | l_i(t) - l_i (t-1) |
-  changeInWeightsPerTimeStep = np.abs(np.diff(consolidationsByTime))
+  # THIS IS WRONG: changeInWeightsPerTimeStep = np.abs(np.diff(consolidationsByTime))
+
 
   # ∑_t (| l_i(t) - l_i (t-1) |)
-  summedConsolidationsForAllTimes = np.sum(changeInWeightsPerTimeStep, axis=1)
+  summedConsolidationsForAllTimes = np.sum(np.abs(consolidationsByTime), axis=1)
 
   # ∑_i ∑_t (| l_i(t) - l_i (t-1) |)
   summedConsolidationsForAllTimesAndMemoryTypes = np.sum(summedConsolidationsForAllTimes, axis=1)
   
 
-# TODO: Refactor this loop.
-  energyConstantsByMemoryType = []
-  for memoryTypeId, memoryTypeData in env.WEIGHT_MEMORY_TYPES.items():
-    energyConstantsByMemoryType.append(memoryTypeData['cost_of_consolidation'])
-  
+  energyConstantsByMemoryType = np.asarray(
+      [x['cost_of_consolidation'] for x in env.WEIGHT_MEMORY_TYPES.values()])
+
   
   # c * ∑_i ∑_t (| l_i(t) - l_i (t-1) |)
   # NOTE: The paper considers c=1 for consolidations. I.e., the cost of consolidation is equal to the change in weight.

@@ -10,6 +10,7 @@ import learning as l
 import energy as e
 import time
 from pandas import DataFrame
+import numpy as np
 from shutil import copyfile
 from os import path
 from itertools import product
@@ -119,7 +120,9 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'max_size_of_transient_memory': str(maxSizeOfTransientMemory),
             'maintenance_cost_of_transient_memory': str(maintenanceCostOfTransientMemory),
             'Optimal threshold': str(optimalThreshold),
-            'Decay rate of transient memory': str(decayTauOfTransientMemory)
+            'Decay rate of transient memory': str(decayTauOfTransientMemory),
+            'number of consolidations': str(len(np.nonzero(consolidationsByEpoch))),
+            'mean consolidation size': str(consolidationsByEpoch[np.nonzero(consolidationsByEpoch)].mean()),
         }
     }
 

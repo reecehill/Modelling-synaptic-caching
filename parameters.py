@@ -1,25 +1,25 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = random.randint(low=0, high=10**2, size=5)
+SEEDS = [0, 1, 2]
 
-LEARNING_RATES = [0.1]
+LEARNING_RATES = [0.8]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
-X_PATTERN_FEATURES = [100]
+X_PATTERN_FEATURES = [250]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
 #amounts = linspace(0.0001, 1.99, 500)
 #N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [100]
+N_PATTERNS = [250]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
 ENSURE_N_PATTERNS_EQUALS_X_PATTERNS_FEATURES = False
 
 # Max epochs before concluding convergence is not possible
-MAX_EPOCHS = 2000
+MAX_EPOCHS = 1000
 
 ENERGY_EXPONENT = 1
 
@@ -46,14 +46,14 @@ CACHE_ALGORITHMS = ['local-global']
 # Accepts:
 # - List of values to set
 # [0]: to find the optimal threshold.
-MAX_SIZES_OF_TRANSIENT_MEMORY = [0]
+MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0.001, 40, 100)
 
 # Only in effect when neurones are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
-MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = [0, 0.0001, 0.001, 0.01]
+MAINTENANCE_COSTS_OF_TRANSIENT_MEMORY = [0.1]
 
 # insert comments for  DECAY_TAUS_OF_TRANSIENT_MEMORY
-DECAY_TAUS_OF_TRANSIENT_MEMORY = linspace(0, 0.004, 10)
+DECAY_TAUS_OF_TRANSIENT_MEMORY = [0.002]
 
 # *-*-*-*-*-*-
 # !! STOP !!

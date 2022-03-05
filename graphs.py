@@ -123,17 +123,18 @@ def makeFigure3(directoryName):
     fig = plt.figure(figsize=(10, 6), dpi=125)
 
     for costOfTransientMemory in usedCostsOfTransientMemory:
-            groupedData = data.where(data['Learning was complete at epoch #'] != False)\
-            .where(data['maintenance_cost_of_transient_memory'] == costOfTransientMemory).groupby('simulationTypeNumber')
+        groupedData = data.where(data['Learning was complete at epoch #'] != False).where(
+            data['maintenance_cost_of_transient_memory'] == costOfTransientMemory).groupby('simulationTypeNumber')
 
-            means = groupedData[list(['Energy expended total',
-                            'Decay rate of transient memory',])
-                        ].mean(numeric_only=True).sort_values('Decay rate of transient memory')
+        means = groupedData[list(['Energy expended total',
+                                  'Decay rate of transient memory', ])
+                            ].mean(numeric_only=True).sort_values('Decay rate of transient memory')
 
-            x = means['Decay rate of transient memory'].to_numpy()
-            y = means['Energy expended total'].to_numpy()
+        x = means['Decay rate of transient memory'].to_numpy()
+        y = means['Energy expended total'].to_numpy()
 
-            plt.plot(x, y, linewidth=1, linestyle="-", label='c='+str(costOfTransientMemory))
+        plt.plot(x, y, linewidth=1, linestyle="-",
+                 label='c='+str(costOfTransientMemory))
 
     #plt.yscale('log')
     # Setting the boundaries of the figure

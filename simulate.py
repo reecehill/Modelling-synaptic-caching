@@ -161,7 +161,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             else:
                 wb = openpyxl.Workbook()
                 ws = wb.worksheets[0]
-                ws['A1'] = "The following sheets show the magnitude of each weight over time. The rows represent each weight, and the columns are epochs. Note that some seeds may have fewer epochs than others."
+                ws['A1'] = "The following sheets show each weight over time. The rows represent each weight, and the columns are epochs. Note that some seeds may have fewer epochs than others."
                 wb.save(fileName)
                 mode = 'a'
 

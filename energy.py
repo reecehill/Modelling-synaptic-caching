@@ -39,7 +39,7 @@ def calculateEnergyFromMaintenance(weightsByEpoch):
   summedWeightsForAllTimesByMemoryType = np.sum(
       summedWeightsForAllTimes, axis=1)
   
-  energyConstantsByMemoryType = np.asarray([x['cost_of_maintenance'] for x in env.WEIGHT_MEMORY_TYPES.values()])
+  energyConstantsByMemoryType = np.asarray([x['cost_of_maintenance'] for x in env.SYNAPSE_MEMORY_TYPES.values()])
   
   # c * ∑_i( ∑_t|s_i(t)|) )
   energyConsumedByMaintenance = np.multiply(
@@ -64,7 +64,7 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
   
 
   energyConstantsByMemoryType = np.asarray(
-      [x['cost_of_consolidation'] for x in env.WEIGHT_MEMORY_TYPES.values()])
+      [x['cost_of_consolidation'] for x in env.SYNAPSE_MEMORY_TYPES.values()])
 
   
   # c * ∑_i ∑_t (| l_i(t) - l_i (t-1) |)
@@ -84,7 +84,7 @@ def calculateOptimalThreshold():
   N = env.X_PATTERN_FEATURE
   # For this, we assume that the last memory type is transient memory!
   # TODO: Tidy this up.
-  c = env.WEIGHT_MEMORY_TYPES[list(env.WEIGHT_MEMORY_TYPES)[-1]]['cost_of_maintenance']
+  c = env.SYNAPSE_MEMORY_TYPES[list(env.SYNAPSE_MEMORY_TYPES)[-1]]['cost_of_maintenance']
   #T = epochIndexForConvergence
   T = (P**(3/2)) / ((2-(P/N))**2)
 

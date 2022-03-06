@@ -6,7 +6,7 @@ def validateParameters():
 
 
 def getSummedWeightsByType(weightsAtTimeT):
-    # Sum all types of weights per neurone (i.e. consolidated + transient) to get neurone's current value.
+    # Sum all types of weights per synapse (i.e. consolidated + transient) to get synapse's current value.
     summedWeightsByType = np.sum(weightsAtTimeT, axis=1)
     return summedWeightsByType
 
@@ -27,22 +27,22 @@ def prepareWeights(trainingDatasetX):
     # -----------
     # Where the size of weight_(N_WEIGHTS) is determined by number of MEMORY_MEMORY_TYPES:
     # weight_(N_WEIGHTS) = [ value_consolidated, value_transient ]
-    nMemoryTypes = len(env.WEIGHT_MEMORY_TYPES)
+    nMemoryTypes = len(env.SYNAPSE_MEMORY_TYPES)
 
     weightsByTime = np.zeros((env.MAX_EPOCHS, env.N_WEIGHTS, nMemoryTypes))
     initialWeights = np.empty((0, nMemoryTypes))
     # Use template model of weights (see parameters.py) to create new matrix of random weights
-    for neuroneTypeName, neuroneTypeData in env.WEIGHT_MODEL.items():
+    for synapseTypeName, synapseTypeData in env.WEIGHT_MODEL.items():
         nWeights = int(round(
-            (neuroneTypeData['percentage_quantity_of_neurones']/100) * env.N_WEIGHTS, 0))
+            (synapseTypeData['percentage_quantity_of_synapses']/100) * env.N_WEIGHTS, 0))
         if(env.WEIGHTS_INITIALISED_AS == 'zeros'):
             randomWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
         elif(env.WEIGHTS_INITIALISED_AS == 'uniform'):
-            randomWeights = env.RANDOM_GENERATOR.uniform(low=float(neuroneTypeData['min']), high=float(
-                neuroneTypeData['max']), size=nWeights).reshape(nWeights, 1)
+            randomWeights = env.RANDOM_GENERATOR.uniform(low=float(synapseTypeData['min']), high=float(
+                synapseTypeData['max']), size=nWeights).reshape(nWeights, 1)
         elif(env.WEIGHTS_INITIALISED_AS == 'lognormal'):
             randomWeights = env.RANDOM_GENERATOR.lognormal(mean=0, sigma=1, size=nWeights).reshape(nWeights, 1)
-            if(neuroneTypeData['max'] == 0):
+            if(synapseTypeData['max'] == 0):
                 randomWeights = randomWeights * -1
         zeroWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
         initialWeightsToAdd = np.hstack((randomWeights, zeroWeights))
@@ -55,8 +55,8 @@ def prepareWeights(trainingDatasetX):
         initialWeights = initialWeights[:-sizeDifference, :]
     elif(sizeDifference < 0):
         initialWeights = np.hstack([initialWeights, env.RANDOM_GENERATOR.uniform(
-            low=float(neuroneTypeData['min']),
-            high=float(neuroneTypeData['max']),
+            low=float(synapseTypeData['min']),
+            high=float(synapseTypeData['max']),
             size=(abs(sizeDifference)))])
 
     # Set weights at t_0 to randomly shuffled initialWeights (so that -ve and +ve weights are shuffled, if present)
@@ -83,10 +83,10 @@ def prepareConsolidationEvents(weightsByTimeShape):
 
 def consolidateAllWeights(newWeightsAtTimeT, consolidationsAtTimeT):
     # Called when learning has finished.
-    # Loop through the different neurones simulated (e.g. excitatory, inhibitory)
-    for neuroneTypeId, neuroneType in env.WEIGHT_NEURONE_TYPES.items():
+    # Loop through the different synapses simulated (e.g. excitatory, inhibitory)
+    for synapseTypeId, synapseType in env.WEIGHT_SYNAPSE_TYPES.items():
         # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
-        for memoryTypeId, memoryType in sorted(neuroneType['memoryTypes'].items(), reverse=True):
+        for memoryTypeId, memoryType in sorted(synapseType['memoryTypes'].items(), reverse=True):
             # Skip "consolidated" memory types (or memory types without limit)
             if(memoryTypeId == 0):
                 continue
@@ -103,10 +103,10 @@ def consolidateAllWeights(newWeightsAtTimeT, consolidationsAtTimeT):
     return newWeightsAtTimeT, consolidationsAtTimeT
 
 def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
-    # Loop through the different neurones simulated (e.g. excitatory, inhibitory)
-    for neuroneTypeId, neuroneType in env.WEIGHT_NEURONE_TYPES.items():
+    # Loop through the different synapses simulated (e.g. excitatory, inhibitory)
+    for synapseTypeId, synapseType in env.WEIGHT_SYNAPSE_TYPES.items():
         # Get the different memory types, starting with the highest valued (as memory moves down the chain, towards consolidation)
-        for memoryTypeId, memoryType in sorted(neuroneType['memoryTypes'].items(), reverse=True):
+        for memoryTypeId, memoryType in sorted(synapseType['memoryTypes'].items(), reverse=True):
             # Skip "consolidated" memory types (or memory types without limit)
             if(memoryTypeId == 0):
                 continue
@@ -187,7 +187,7 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
     # TODO: this code will fail if weights are not defined as excitatory or inhibitory.
     newWeights = np.zeros(weightsAtTimeT.shape)
     for neuronalType, indexesOfWeightsByNeuronalType in neuronalTypes.items():
-        if(env.NEURONES_CAN_CHANGE_TYPE_MID_SIMULATION):
+        if(env.SYNAPSES_CAN_CHANGE_TYPE_MID_SIMULATION):
             a_min = abs(np.inf) * -1
             a_max = np.inf
         elif (neuronalType == 'excitatory'):
@@ -205,12 +205,13 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
         try:
             weightsAtTimeT = np.clip(a=newWeights, a_min=a_min, a_max=a_max)
         except:
-            print("Neurones must be allowed to switch type (i.e., inhibitory->excitatory) if there is only one neurone type. You may #want to check the NEURONES_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY parameter.")
+            print("Synapses must be allowed to switch type (i.e., inhibitory->excitatory) if there is only one synapse type. You may #want to check the SYNAPSE_TYPES_BEGIN_EITHER_INHIBITORY_OR_EXCITATORY parameter.")
     return weightsAtTimeT, consolidationsAtTimeT
 
 
 def updateNextWeights(weightsAtTimeT):
-    decayRatesByMemoryType = np.asarray([x['decay_tau'] for x in env.WEIGHT_MEMORY_TYPES.values()], dtype=np.float32)
+    decayRatesByMemoryType = np.asarray(
+        [x['decay_tau'] for x in env.SYNAPSE_MEMORY_TYPES.values()], dtype=np.float32)
 
     nonZeroDecayRates = np.nonzero(decayRatesByMemoryType)
     if(len(nonZeroDecayRates)==0):

@@ -47,7 +47,7 @@ CACHE_ALGORITHMS = ['local-global']
 # Accepts:
 # - List of values to set
 # ['optimal']: to find the optimal threshold.
-MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0, 40, 11)
+MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0, 40, 20)
 
 # Only in effect when synapses are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.

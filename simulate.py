@@ -161,7 +161,35 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             else:
                 wb = openpyxl.Workbook()
                 ws = wb.worksheets[0]
-                ws['A1'] = "The following sheets show each weight over time. The rows represent each weight, and the columns are epochs. Note that some seeds may have fewer epochs than others."
+                ws['A4'] = "The following sheets show each weight over time. The rows represent each weight, and the columns are epochs. Note that some seeds may have fewer epochs than others."
+                ws['C1'] = 'simulationTypeNumber'
+                ws['D1'] = 'seed'
+                ws['E1'] = 'learning_rate'
+                ws['F1'] = 'n_pattern'
+                ws['G1'] = 'n_pattern_features'
+                ws['H1'] = 'max_epochs'
+                ws['I1'] = 'energy_exponent'
+                ws['J1'] = 'preset_simulation'
+                ws['K1'] = 'weights_initialised_as'
+                ws['L1'] = 'cache_algorithm'
+                ws['M1'] = 'max_size_of_transient_memory'
+                ws['N1'] = 'maintenance_cost_of_transient_memory'
+                ws['O1'] = 'Decay rate of transient memory'
+                ws['C2'] = simulationTypeNumber
+                ws['D2'] = seed
+                ws['E2'] = learningRate
+                ws['F2'] = nPattern
+                ws['G2'] = xPatternFeature
+                ws['H2'] = env.MAX_EPOCHS
+                ws['I2'] = env.ENERGY_EXPONENT
+                ws['J2'] = env.PRESET_SIMULATION
+                ws['K2'] = env.WEIGHTS_INITIALISED_AS
+                ws['L2'] = env.CACHE_ALGORITHM
+                ws['M2'] = env.MAX_SIZE_OF_TRANSIENT_MEMORY
+                ws['N2'] = env.MAINTENANCE_COST_OF_TRANSIENT_MEMORY
+                ws['O2'] = env.DECAY_TAU_OF_TRANSIENT_MEMORY
+                				
+
                 wb.save(fileName)
                 mode = 'a'
 

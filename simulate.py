@@ -9,8 +9,9 @@ else:
 import learning as l
 import energy as e
 import time
-from pandas import DataFrame
+import pandas as pd
 import numpy as np
+import openpyxl
 from shutil import copyfile
 from os import path
 from itertools import product
@@ -126,6 +127,11 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         }
     }
 
+    # Copy the parameters file too (so output can be reproduced)
+    # TODO: we lazily remove output.csv to get the folder
+    copyfile('parameters.py', str(filePath[:-10])+'parameters.py')
+    copyfile('__init__.py', str(filePath[:-10])+'__init__.py')
+
     if path.isfile(filePath):
         mode = 'a'
         header = 0
@@ -134,14 +140,40 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         mode = 'w'
         header = list(report[simulationNumber].keys())
         columns = header
-
-    # Copy the parameters file too (so output can be reproduced)
-    # TODO: we lazily remove output.csv to get the folder
-    copyfile('parameters.py', str(filePath[:-10])+'parameters.py')
-    copyfile('__init__.py', str(filePath[:-10])+'__init__.py')
-
-    DataFrame.from_dict(report).transpose().to_csv(
+    pd.DataFrame.from_dict(report).transpose().to_csv(
         filePath, header=header, columns=columns, mode=mode)
+
+    if((env.STORE_WEIGHTS_TO_SPREADSHEET == False ) or (totalSimulations > 50)):
+        pass
+    else:
+        # Reorder weights, so that now they are by weight memory type.
+        # eg. [0] =  weight1, weight2, ..., weightK
+        # Where weight1 = t1, t2, ..., tn
+        weightsByEpoch = np.swapaxes(weightsByEpoch,0,2)
+        
+        
+        for weightMemoryTypeId, weightMemoryType in enumerate(weightsByEpoch):
+            fileName = directoryName+'/data/simulation-'+str(simulationTypeNumber)+'-weights-' + \
+                str(env.SYNAPSE_MEMORY_TYPES[weightMemoryTypeId]['name'])+'.xlsx'
+
+            if path.exists(fileName):
+                mode = 'a'
+            else:
+                wb = openpyxl.Workbook()
+                ws = wb.worksheets[0]
+                ws['A1'] = "The following sheets show the magnitude of each weight over time. The rows represent each weight, and the columns are epochs. Note that some seeds may have fewer epochs than others."
+                wb.save(fileName)
+                mode = 'a'
+
+            excel_book = openpyxl.load_workbook(fileName)
+            with pd.ExcelWriter(fileName, mode=mode) as writer:
+                writer.book = excel_book
+                writer.sheets = {
+                    worksheet.title: worksheet for worksheet in excel_book.worksheets}
+                pd.DataFrame(weightMemoryType[:,:epochIndexForConvergence]).dropna().to_excel(
+                writer, sheet_name='Seed-'+str(seed))
+        
+        
     print("Simulation "+str(simulationNumber) +
           " of "+str(totalSimulations))
     timeElapsed = time.time() - start

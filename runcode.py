@@ -10,7 +10,7 @@ else:
 
 import simulate as s
 import graphs as g
-from os import mkdir
+from os import mkdir, path
 from datetime import datetime
 from multiprocessing import cpu_count, Pool
 
@@ -27,6 +27,7 @@ if __name__ == "__main__":  # If main function
         # -- PREPARE DIRECTORY FOR OUTPUT
         directoryName = datetime.now().strftime("%Y%m%d-%H%M%S")
         mkdir(directoryName)
+        mkdir(directoryName+'/data')
         filePath = directoryName+'/output.csv'
 
         # Prepare and print total number of simulations
@@ -45,8 +46,12 @@ if __name__ == "__main__":  # If main function
                     simulationNumber, simulationTypeNumber, s.TOTAL_SIMULATIONS, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, decayTauOfTransientMemory, seed, filePath, directoryName))
         pool.close()
         pool.join()
-        print("A csv file has been produced and is available at: (location of this script)/"+str(filePath))
-        
+        if path.exists(filePath):
+            print("A csv file has been produced and is available at: (location of this script)/"+str(filePath))
+        else:
+            print("There was an error making the .csv file of statistics.")
+
+        print("You can store the weights (over time, for each seed) to a spreadsheet. To do so, ensure the maximum number of simulations that your parameters generate is less than 50, as this leads to less than 50 sheets being created. You can check if this was complete for this simulation by searching the 'data' folder.")
 
     else:
         directoryName = conf.RUN_SIMULATION

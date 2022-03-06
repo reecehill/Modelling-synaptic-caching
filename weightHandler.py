@@ -34,12 +34,16 @@ def prepareWeights(trainingDatasetX):
     # Use template model of weights (see parameters.py) to create new matrix of random weights
     for synapseTypeName, synapseTypeData in env.WEIGHT_MODEL.items():
         nWeights = int(round(
-            (synapseTypeData['percentage_quantity_of_synapses']/100) * env.N_WEIGHTS, 0))
+            (synapseTypeData['percentage_quantity_of_synapses']/100) * env.N_WEIGHTS, 0)+1)
+
+
         if(env.WEIGHTS_INITIALISED_AS == 'zeros'):
             randomWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
+
         elif(env.WEIGHTS_INITIALISED_AS == 'uniform'):
             randomWeights = env.RANDOM_GENERATOR.uniform(low=float(synapseTypeData['min']), high=float(
                 synapseTypeData['max']), size=nWeights).reshape(nWeights, 1)
+
         elif(env.WEIGHTS_INITIALISED_AS == 'lognormal'):
             randomWeights = env.RANDOM_GENERATOR.lognormal(mean=0, sigma=1, size=nWeights).reshape(nWeights, 1)
             if(synapseTypeData['max'] == 0):
@@ -48,16 +52,11 @@ def prepareWeights(trainingDatasetX):
         initialWeightsToAdd = np.hstack((randomWeights, zeroWeights))
         initialWeights = np.append(initialWeights, initialWeightsToAdd, axis=0)
 
-    # Due to rounding of nWeights, the matrix may be of incorrect shape. Remove/add row(s) to suit.
+    # Due to rounding of nWeights, the matrix may be of incorrect shape. Remove row(s) to suit.
     sizeDifference = len(initialWeights) - (env.N_WEIGHTS)
     if(sizeDifference > 0):
         # Matrix is too large, so remove last rows.
         initialWeights = initialWeights[:-sizeDifference, :]
-    elif(sizeDifference < 0):
-        initialWeights = np.hstack([initialWeights, env.RANDOM_GENERATOR.uniform(
-            low=float(synapseTypeData['min']),
-            high=float(synapseTypeData['max']),
-            size=(abs(sizeDifference)))])
 
     # Set weights at t_0 to randomly shuffled initialWeights (so that -ve and +ve weights are shuffled, if present)
     weightsByTime[0] = initialWeights

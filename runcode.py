@@ -72,6 +72,7 @@ if __name__ == "__main__":  # If main function
 
     if(s.TOTAL_SIMULATIONS == (len(env.MAX_SIZES_OF_TRANSIENT_MEMORY) * len(env.SEEDS))):
         fig2b = g.makeFigure2b(directoryName)
+        fig2bModified = g.makeFigure2bModified(directoryName)
     else:
         print("Skipped producing Figure 2b. To produce this figure, fix all parameters but MAX_SIZES_OF_TRANSIENT_MEMORY. You may have to check the synapse and memory types are set correctly too. ")
 

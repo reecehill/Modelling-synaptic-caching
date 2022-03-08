@@ -39,7 +39,7 @@ def getAllSimulationPossibilities():
 
 
 def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgorithm, xPatternFeature, nPattern, learningRate, maxSizeOfTransientMemory, maintenanceCostOfTransientMemory, decayTauOfTransientMemory, seed, filePath, directoryName):
-    
+
     env.setCacheAlgorithm(cacheAlgorithm)
     env.setXPatternFeature(xPatternFeature)
     env.setNPattern(nPattern)
@@ -56,9 +56,8 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         env.setMaxSizeOfTransientMemory(env.MAX_SIZE_OF_TRANSIENT_MEMORY)
         env.setWeightModel()
 
-        
     start = time.time()
-    
+
     # Generate datasets
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 
@@ -84,6 +83,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         weightsByEpoch)
     consolidationEnergy = e.calculateEnergyFromConsolidations(
         consolidationsByEpoch)
+    energyBeforeThr = e.calculateEnergyJustBeforeThreshold(weightsByEpoch, consolidationsByEpoch)
     optimalThreshold = e.calculateOptimalThreshold()
     report = {
         simulationNumber:
@@ -102,9 +102,11 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'Simulated: efficiency (m_perc/m_min)': str(efficiency),
             'Simulated-Theoretical efficiency difference': str(round((efficiency - theoreticalEfficiency), 3)),
             'Theoretical: minimum energy for learning': str(theoreticalMinimumEnergy),
-            'Simulated: energy actually used by learning': str(metabolicEnergy), # Energy used hypothetically with no caching
-            'Energy expended by simulations for consolidations': str(consolidationEnergy), 
+            # Energy used hypothetically with no caching
+            'Simulated: energy actually used by learning': str(metabolicEnergy),
+            'Energy expended by simulations for consolidations': str(consolidationEnergy),
             'Energy expended by simulations for maintenance': str(maintenanceEnergy),
+            'Energy expended by simulations for maintenance (plus before thr)': str(maintenanceEnergy + energyBeforeThr),
             'Energy expended total': str(round((consolidationEnergy + maintenanceEnergy), 3)),
             '(seen) NLL': str(trainNLL)+'%',
             '(seen) Accuracy': str(trainAccuracy)+'%',
@@ -143,18 +145,18 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
     pd.DataFrame.from_dict(report).transpose().to_csv(
         filePath, header=header, columns=columns, mode=mode)
 
-    if((env.STORE_WEIGHTS_TO_SPREADSHEET == False ) or (totalSimulations > 50)):
+    if((env.STORE_WEIGHTS_TO_SPREADSHEET == False) or (totalSimulations > 50)):
         pass
     else:
         # Reorder weights, so that now they are by weight memory type.
         # eg. [0] =  weight1, weight2, ..., weightK
         # Where weight1 = t1, t2, ..., tn
-        weightsByEpoch = np.swapaxes(weightsByEpoch,0,2)
-        
-        
+        weightsByEpoch = np.swapaxes(weightsByEpoch, 0, 2)
+
         for weightMemoryTypeId, weightMemoryType in enumerate(weightsByEpoch):
             fileName = directoryName+'/data/simulation-'+str(simulationTypeNumber)+'-weights-' + \
-                str(env.SYNAPSE_MEMORY_TYPES[weightMemoryTypeId]['name'])+'.xlsx'
+                str(env.SYNAPSE_MEMORY_TYPES[weightMemoryTypeId]
+                    ['name'])+'.xlsx'
 
             if path.exists(fileName):
                 mode = 'a'
@@ -188,9 +190,9 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
                 ws['M2'] = env.MAX_SIZE_OF_TRANSIENT_MEMORY
                 ws['N2'] = env.MAINTENANCE_COST_OF_TRANSIENT_MEMORY
                 ws['O2'] = env.DECAY_TAU_OF_TRANSIENT_MEMORY
-                				
 
                 wb.save(fileName)
+                wb.close()
                 mode = 'a'
 
             excel_book = openpyxl.load_workbook(fileName)
@@ -198,10 +200,9 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
                 writer.book = excel_book
                 writer.sheets = {
                     worksheet.title: worksheet for worksheet in excel_book.worksheets}
-                pd.DataFrame(weightMemoryType[:,:epochIndexForConvergence]).dropna().to_excel(
-                writer, sheet_name='Seed-'+str(seed))
-        
-        
+                pd.DataFrame(weightMemoryType[:, :epochIndexForConvergence]).dropna().to_excel(
+                    writer, sheet_name='Seed-'+str(seed))
+
     print("Simulation "+str(simulationNumber) +
           " of "+str(totalSimulations))
     timeElapsed = time.time() - start

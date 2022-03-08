@@ -1,6 +1,6 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = list(range(1, 3))
+SEEDS = list(range(1, 6))
 
 LEARNING_RATES = [0.1]
 
@@ -10,9 +10,9 @@ X_PATTERN_FEATURES = [200]
 
 
 # Ensure N_PATTERNS is not zero, and not equal to double X_PATTERN_FEATURES
-#amounts = linspace(0.0001, 1.99, 100)
-#N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
-N_PATTERNS = [100]
+amounts = linspace(0.0001, 1.99, 500)
+N_PATTERNS = [int(x*X_PATTERN_FEATURES[0]) for x in amounts]
+#N_PATTERNS = [200]
 # X_PATTERNS = X_PATTERN_FEATURES
 
 # Skips simulations where N_PATTERNS != X_PATTERN_FEATURES
@@ -35,7 +35,7 @@ WEIGHTS_INITIALISED_AS = 'zeros'
 # Set simulation parameters according to preset scenarios. Enter an integer, as follows:
 # 1: Synapses have behaviour alike that in the paper.
 # 2: Prevent synapses from switching between excitatory/inhibitory (and deactivate them/set to zero if they try)
-PRESET_SIMULATION = 2
+PRESET_SIMULATION = 1
 
 # Type of synapse consolidation:
 # 'local-local': Any one synapse that exceeds a threshold (local), will lead to just that synapse consolidating (local).
@@ -114,7 +114,7 @@ def setXPatternFeature(xPatternFeature):
     X_PATTERN_FEATURE = xPatternFeature
 
     #WEIGHT_MODEL = WEIGHT_SYNAPSE_TYPES
-    N_WEIGHTS = X_PATTERN_FEATURE +1 # Add an extra weight for the bias term.
+    N_WEIGHTS = X_PATTERN_FEATURE
 
 
 def setWeightModel():

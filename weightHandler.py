@@ -183,7 +183,6 @@ def consolidateWeightsAboveThreshold(newWeightsAtTimeT, consolidationsAtTimeT):
     return newWeightsAtTimeT, consolidationsAtTimeT
 
 def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtTimeT):
-    # TODO: this code will fail if weights are not defined as excitatory or inhibitory.
     newWeights = np.zeros(weightsAtTimeT.shape)
     for neuronalType, indexesOfWeightsByNeuronalType in neuronalTypes.items():
         if(env.SYNAPSES_CAN_CHANGE_TYPE_MID_SIMULATION):
@@ -195,6 +194,8 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
         elif(neuronalType == 'inhibitory'):
             a_min = abs(np.inf) * -1
             a_max = 0.0
+        else:
+            raise Exception('Synapses must either be able to change to type (i.e., have no limits), or be labelled either excitatory or inhibitory.')
 
         newWeights[indexesOfWeightsByNeuronalType] = weightsAtTimeT[indexesOfWeightsByNeuronalType] + \
             deltaWeights[indexesOfWeightsByNeuronalType]
@@ -208,7 +209,7 @@ def updateWeights(weightsAtTimeT, deltaWeights, neuronalTypes, consolidationsAtT
     return weightsAtTimeT, consolidationsAtTimeT
 
 
-def updateNextWeights(weightsAtTimeT):
+def getDecayedWeights(weightsAtTimeT):
     decayRatesByMemoryType = np.asarray(
         [x['decay_tau'] for x in env.SYNAPSE_MEMORY_TYPES.values()], dtype=np.float32)
 

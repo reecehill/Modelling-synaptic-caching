@@ -13,13 +13,14 @@ def validateParameters():
 def getDatasets():
   def generateDataset():
     # -- GENERATE DATASET
+
     datasetX = env.RANDOM_GENERATOR.integers(
         2, size=(env.N_PATTERN, env.X_PATTERN_FEATURE))
     datasetX[datasetX == 0] = -1  # Rewrite zeros to -1.
     
     # TO-DO: Should we add ones to our dataset? If so, how do we handle the shape difference between weights and features?
-    #ones = np.ones((env.N_PATTERN, 1))
-    #datasetX = np.hstack([ones, datasetX])
+    ones = np.ones((env.N_PATTERN, 1))
+    datasetX = np.hstack([ones, datasetX])
 
     # Add targets to dataset
     datasetY = env.RANDOM_GENERATOR.integers(2, size=(env.N_PATTERN, 1))
@@ -46,7 +47,7 @@ def trainWeights(trainingDatasetX, trainingDatasetY):
   for epochIndex in range(1, env.MAX_EPOCHS):
     sum_mse = 0.0
     # Get current weights as a function of the previous weights (with/without decay)
-    weightsByTime[epochIndex] = w.updateNextWeights(weightsByTime[epochIndex-1])
+    weightsByTime[epochIndex] = w.getDecayedWeights(weightsByTime[epochIndex-1])
 
 
     for patternIndex, pattern in enumerate(trainingDatasetX):

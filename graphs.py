@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import parameters as env
 
 def showFigures():
     plt.show()
@@ -16,8 +16,8 @@ def makeFigure1c(directoryName):
 
     y1 = means['Simulated: energy actually used by learning'].to_numpy()
     y2 = means['Theoretical: minimum energy for learning'].to_numpy()
-    y1Min = y1.min() if y1.min() > 0 else 0
-    y1Max = y1.max()
+
+
     x = means['n_pattern'].to_numpy() / means['n_pattern_features'].to_numpy()
     # Setting the figure size and resolution
     fig = plt.figure(figsize=(10, 6), dpi=300)
@@ -44,8 +44,8 @@ def makeFigure1d(directoryName):
 
     y1 = means['Theoretical: random-walk efficiency'].to_numpy()
     y2 = means['Simulated: efficiency (m_perc/m_min)'].to_numpy()
-    y1Min = y1.min() if y1.min() > 0 else 0
-    y1Max = y1.max()
+
+
     x = means['n_pattern'].to_numpy() / means['n_pattern_features'].to_numpy()
     # Setting the figure size and resolution
     fig = plt.figure(figsize=(10, 6), dpi=300)
@@ -61,15 +61,56 @@ def makeFigure1d(directoryName):
     return fig
 
 
-def makeFigure2b(directoryName):
+def makeFigure2bModified(directoryName):
+    if(env.ALSO_CALCULATE_ENERGY_TO_REACH_THRESHOLD == False):
+        return
+
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
     data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
         'max_size_of_transient_memory').groupby('simulationTypeNumber')
     means = data[list(['max_size_of_transient_memory',
                        'Simulated: energy actually used by learning',
                        'Energy expended by simulations for consolidations',
+                       'Energy expended by simulations for maintenance (plus before thr)'])
+                 ].mean().sort_values('max_size_of_transient_memory')
+
+
+    y_consolidations = means['Energy expended by simulations for consolidations'].to_numpy()
+    y_maintenance = means['Energy expended by simulations for maintenance (plus before thr)'].to_numpy(
+    )
+    y_total = y_maintenance + y_consolidations
+    x = means['max_size_of_transient_memory'].to_numpy()
+    # Setting the figure size and resolution
+    fig = plt.figure(figsize=(10, 6), dpi=300)
+    plt.step(x, y_total, color="black",  linewidth=1, linestyle="-", label='Total energy')
+    plt.step(x, y_consolidations, color="blue",  linewidth=1, linestyle="-", label='Consolidation energy')
+    plt.step(x, y_maintenance, color="orange",  linewidth=1, linestyle="-", label='Maintenance energy')
+
+    #plt.yscale('log')
+    # Setting the boundaries of the figure
+    #plt.ylim(0, 3*10**6)
+    plt.xlim(0, 40)
+    plt.xlabel('Consolidation threshold')  # add x-label
+    plt.ylabel('Energy used (a.u.)')  # add y-label
+    plt.legend()
+    fig.savefig(directoryName+"/figure2b.png", dpi=125)  # save figure
+    return fig
+def makeFigure2b(directoryName):
+    data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
+    
+    # If optimal thresholds have been used, replace with the optimal threshold rather than the word itself.
+    rowsWithOptimalThresholdSet = data[data['max_size_of_transient_memory'] == 'optimal']
+    rowsWithOptimalThresholdSet['max_size_of_transient_memory'] = rowsWithOptimalThresholdSet['Optimal threshold']
+    data[data['max_size_of_transient_memory'] == 'optimal'] = rowsWithOptimalThresholdSet
+
+
+    data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
+        'max_size_of_transient_memory').groupby('simulationTypeNumber')
+    means = data[list(['max_size_of_transient_memory',
+                       'Simulated: energy actually used by learning',
+                       'Energy expended by simulations for consolidations',
                        'Energy expended by simulations for maintenance'])
-                 ].mean(numeric_only=True).sort_values('max_size_of_transient_memory')
+                 ].mean().sort_values('max_size_of_transient_memory')
 
 
     y_consolidations = means['Energy expended by simulations for consolidations'].to_numpy()

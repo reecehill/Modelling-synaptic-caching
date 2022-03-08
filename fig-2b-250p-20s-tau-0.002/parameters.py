@@ -1,8 +1,8 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = list(range(0,300))
+SEEDS = list(range(0,20))
 
-LEARNING_RATES = [1]
+LEARNING_RATES = [2]
 
 # The number of pattern features will always be equal to the number of weights.
 # Could be 8200, according to https://pubmed.ncbi.nlm.nih.gov/2778101/
@@ -47,7 +47,7 @@ CACHE_ALGORITHMS = ['local-global']
 # Accepts:
 # - List of values to set
 # ['optimal']: to find the optimal threshold.
-MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0.001, 40, 500)
+MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0.001, 40, 120)
 
 # Only in effect when synapses are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.

@@ -71,20 +71,28 @@ def makeFigure2bModified(directoryName):
     means = data[list(['max_size_of_transient_memory',
                        'Simulated: energy actually used by learning',
                        'Energy expended by simulations for consolidations',
-                       'Energy expended by simulations for maintenance (plus before thr)'])
+                       'Energy expended by simulations for maintenance',
+                       'Energy expended by simulations for maintenance (before thr)'])
                  ].mean().sort_values('max_size_of_transient_memory')
 
 
     y_consolidations = means['Energy expended by simulations for consolidations'].to_numpy()
-    y_maintenance = means['Energy expended by simulations for maintenance (plus before thr)'].to_numpy(
+    y_maintenance = means['Energy expended by simulations for maintenance'].to_numpy()
+    y_maintenance_before_thr = means['Energy expended by simulations for maintenance (before thr)'].to_numpy(
     )
     y_total = y_maintenance + y_consolidations
+    y_total_thr = y_maintenance + y_maintenance_before_thr + y_consolidations
     x = means['max_size_of_transient_memory'].to_numpy()
     # Setting the figure size and resolution
     fig = plt.figure(figsize=(10, 6), dpi=300)
-    plt.step(x, y_total, color="black",  linewidth=1, linestyle="-", label='Total energy')
+    #plt.step(x, y_total, color="black",  linewidth=1, linestyle="-", label='Total energy')
     plt.step(x, y_consolidations, color="blue",  linewidth=1, linestyle="-", label='Consolidation energy')
     plt.step(x, y_maintenance, color="orange",  linewidth=1, linestyle="-", label='Maintenance energy')
+    plt.step(x, y_total, color="black",  linewidth=1,
+             linestyle="-", label='Total energy')
+    plt.step(x, y_maintenance+y_maintenance_before_thr, color="orange",  linewidth=1, linestyle='--', label='Maintenance energy (corrected)')
+    plt.step(x, y_total_thr, color="black",  linewidth=1,
+             linestyle="--", label='Total energy (corrected)')
 
     #plt.yscale('log')
     # Setting the boundaries of the figure

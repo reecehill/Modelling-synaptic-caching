@@ -1,5 +1,6 @@
 import parameters as env
 import numpy as np
+
 def validateParameters():
   global ENERGY_EXPONENT
   print("Skipped validation of parameters (energy)...")
@@ -80,36 +81,9 @@ def calculateEnergyFromConsolidations(consolidationsByEpoch):
   return round(summedConsolidationEnergy, 3)
 
 
-def calculateEnergyJustBeforeThreshold(weightsByEpoch, consolidationsByEpoch):
-  if(env.ALSO_CALCULATE_ENERGY_TO_REACH_THRESHOLD == False):
-      return 0
-  # TODO: This function only works for TWO memory types!!!!
-  energy = 0
-
-  # TODO: Convert this to work with matrices for speed.
-  # Loop through every time step bar the initial conditions.
-  for epochIndex, epochData in enumerate(consolidationsByEpoch[1:]):
-    # Loop through every weight_i
-    for weightIndex, weight in enumerate(epochData):
-      # Find indexes where weight_i is made up of non-zero values (i.e. a consolidation event occurred)
-      indexesOfTypeConsolidated = np.nonzero(weight)
-
-      # If no events were found, skip.
-      if(len(indexesOfTypeConsolidated[0]) < 1):
-        continue
-
-      # If events are found, loop through them.
-      for indexOfTypeConsolidated in indexesOfTypeConsolidated:
-
-        # For each event, note the weight type and time t. Get the value of this memory type at t-1.
-        weightBeforeConsolidation = abs(weightsByEpoch[epochIndex-1][weightIndex][indexOfTypeConsolidated][0])
-
-        # threshold - weight(t-1) = distance travelled to hit threshold.
-        # add this to on-going energy.
-        energy += abs(env.MAX_SIZE_OF_TRANSIENT_MEMORY - weightBeforeConsolidation)
-
+def calculateEnergyJustBeforeThreshold():
   # Multiply this by the energy constant.
-  return energy * env.MAINTENANCE_COST_OF_TRANSIENT_MEMORY
+  return env.ENERGY_USED_TO_REACH_THRESHOLD_TALLY * env.MAINTENANCE_COST_OF_TRANSIENT_MEMORY
 
 
 def calculateOptimalThreshold():

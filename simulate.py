@@ -57,7 +57,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         env.setWeightModel()
 
     start = time.time()
-
+    env.ENERGY_USED_TO_REACH_THRESHOLD_TALLY = 0
     # Generate datasets
     trainingDatasetX, trainingDatasetY, testingDatasetX, testingDatasetY = l.getDatasets()
 
@@ -83,7 +83,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
         weightsByEpoch)
     consolidationEnergy = e.calculateEnergyFromConsolidations(
         consolidationsByEpoch)
-    energyBeforeThr = e.calculateEnergyJustBeforeThreshold(weightsByEpoch, consolidationsByEpoch)
+    energyBeforeThr = e.calculateEnergyJustBeforeThreshold()
     optimalThreshold = e.calculateOptimalThreshold()
     report = {
         simulationNumber:
@@ -106,7 +106,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'Simulated: energy actually used by learning': str(metabolicEnergy),
             'Energy expended by simulations for consolidations': str(consolidationEnergy),
             'Energy expended by simulations for maintenance': str(maintenanceEnergy),
-            'Energy expended by simulations for maintenance (plus before thr)': str(maintenanceEnergy + energyBeforeThr),
+            'Energy expended by simulations for maintenance (before thr)': str(energyBeforeThr),
             'Energy expended total': str(round((consolidationEnergy + maintenanceEnergy), 3)),
             '(seen) NLL': str(trainNLL)+'%',
             '(seen) Accuracy': str(trainAccuracy)+'%',

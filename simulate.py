@@ -126,6 +126,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
             'Decay rate of transient memory': str(decayTauOfTransientMemory),
             'number of consolidations': str(len(np.nonzero(consolidationsByEpoch))),
             'mean consolidation size': str(consolidationsByEpoch[np.nonzero(consolidationsByEpoch)].mean()),
+            'number of memory types': str(len(env.SYNAPSE_MEMORY_TYPES)),
         }
     }
 

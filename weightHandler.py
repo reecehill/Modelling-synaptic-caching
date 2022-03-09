@@ -38,17 +38,21 @@ def prepareWeights(trainingDatasetX):
 
 
         if(env.WEIGHTS_INITIALISED_AS == 'zeros'):
-            randomWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
+            randomWeights = np.zeros(shape=(nWeights, 1)) #Represents the initial conditions, applied only to the top most memory Type (i.e. consolidarted)
 
         elif(env.WEIGHTS_INITIALISED_AS == 'uniform'):
             randomWeights = env.RANDOM_GENERATOR.uniform(low=float(synapseTypeData['min']), high=float(
-                synapseTypeData['max']), size=nWeights).reshape(nWeights, 1)
+                synapseTypeData['max']), size=(nWeights, 1))
 
         elif(env.WEIGHTS_INITIALISED_AS == 'lognormal'):
-            randomWeights = env.RANDOM_GENERATOR.lognormal(mean=0, sigma=1, size=nWeights).reshape(nWeights, 1)
+            randomWeights = env.RANDOM_GENERATOR.lognormal(mean=0, sigma=1, size=(nWeights, 1))
             if(synapseTypeData['max'] == 0):
                 randomWeights = randomWeights * -1
+
+        # Set all memory types that are below the top-most (i.e., consolidated) to zero.
         zeroWeights = np.zeros(shape=(nWeights, nMemoryTypes-1))
+
+        # Combine initial conditions with zeroWeights.
         initialWeightsToAdd = np.hstack((randomWeights, zeroWeights))
         initialWeights = np.append(initialWeights, initialWeightsToAdd, axis=0)
 

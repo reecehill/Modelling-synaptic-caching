@@ -1,6 +1,6 @@
 # CONSTANT PARAMETERS
 from numpy import random, linspace
-SEEDS = list(range(0,300))
+SEEDS = list(range(0,5))
 
 LEARNING_RATES = [1]
 
@@ -47,7 +47,8 @@ CACHE_ALGORITHMS = ['local-global']
 # Accepts:
 # - List of values to set
 # ['optimal']: to find the optimal threshold.
-MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0.001, 40, 500)
+#MAX_SIZES_OF_TRANSIENT_MEMORY = [2]
+MAX_SIZES_OF_TRANSIENT_MEMORY = linspace(0, 40, 100)
 
 # Only in effect when synapses are allowed to have transient/consolidated memory types.
 # Used for figure 4 of paper.
@@ -181,7 +182,16 @@ def generateWeightModel():
                 'cost_of_maintenance': MAINTENANCE_COST_OF_TRANSIENT_MEMORY,
                 # The highest memory type does not receive weights for consolidation.
                 'cost_of_consolidation': 0
-            }
+            },
+        # Uncomment the lines below to add an additional memory type. You ought to also change the cost_of_consolidation for the precreding memory type.
+        #    2: {
+        #        'name': 'smaller_transient',
+        #        'memory_size': MAX_SIZE_OF_TRANSIENT_MEMORY/4,
+        #        'decay_tau': DECAY_TAU_OF_TRANSIENT_MEMORY*2,  # amount memory decays per time step
+        #        'cost_of_maintenance': MAINTENANCE_COST_OF_TRANSIENT_MEMORY/4,
+        #        # The highest memory type does not receive weights for consolidation.
+        #        'cost_of_consolidation': 0
+        #    }
         }
     else:
         SYNAPSE_MEMORY_TYPES = {

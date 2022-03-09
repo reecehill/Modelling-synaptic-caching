@@ -66,6 +66,9 @@ def makeFigure2bModified(directoryName):
         return
 
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
+    if(len(data.where(data['max_size_of_transient_memory'] == 'optimal')) > 0):
+        print("You cannot produce Figure 2b if you requested max_size_of_transient_memory to be optimal.")
+        return
     data = data.where(data['Learning was complete at epoch #'] != False).sort_values(
         'max_size_of_transient_memory').groupby('simulationTypeNumber')
     means = data[list(['max_size_of_transient_memory',
@@ -105,7 +108,9 @@ def makeFigure2bModified(directoryName):
     return fig
 def makeFigure2b(directoryName):
     data = pd.read_csv(directoryName+'/output.csv', delimiter=',', na_values=['inf', 'nan']).dropna()
-    
+    if(len(data.where(data['max_size_of_transient_memory'] == 'optimal')) > 0):
+        print("You cannot produce Figure 2b if you requested max_size_of_transient_memory to be optimal.")
+        return
     # If optimal thresholds have been used, replace with the optimal threshold rather than the word itself.
     rowsWithOptimalThresholdSet = data[data['max_size_of_transient_memory'] == 'optimal']
     rowsWithOptimalThresholdSet['max_size_of_transient_memory'] = rowsWithOptimalThresholdSet['Optimal threshold']

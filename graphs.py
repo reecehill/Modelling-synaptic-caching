@@ -21,9 +21,11 @@ def makeFigure1c(directoryName):
     x = means['n_pattern'].to_numpy() / means['n_pattern_features'].to_numpy()
     # Setting the figure size and resolution
     fig = plt.figure(figsize=(10, 6), dpi=300)
-    plt.plot(x, y1, color="red",  linewidth=1, linestyle="-")
-    plt.plot(x, y2, color="green",  linewidth=1, linestyle="-")
+    plt.plot(x, y1, color="red",  label='Simulated energy', linewidth=1, linestyle="-")
+    plt.plot(x, y2, color="green",  label='Minimum energy',
+             linewidth=1, linestyle="-")
     plt.yscale('log')
+    plt.legend()
     # Setting the boundaries of the figure
     plt.xlim(0, 2)
     #plt.ylim(10**3, 10**9)

@@ -6,8 +6,8 @@ def validateParameters():
   print("Skipped validation of parameters (energy)...")
 
 
-def calculateTheoreticalMinimumEnergy(weightsByEpoch):
-  return round(np.sum(abs(weightsByEpoch[-1] - weightsByEpoch[0])), 3)
+def calculateTheoreticalMinimumEnergy(weightsByEpoch, epochIndexForConvergence):
+    return round(np.sum(np.abs(weightsByEpoch[epochIndexForConvergence] - weightsByEpoch[0])), 3)
 
 def calculateMetabolicEnergy(weightsByEpoch):
   # Synapse weights is currently rowed by epoch, rearrange so that each row is the same synapse but over time

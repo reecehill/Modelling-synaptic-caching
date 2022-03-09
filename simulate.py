@@ -76,7 +76,7 @@ def simulate(simulationNumber, simulationTypeNumber, totalSimulations, cacheAlgo
     theoreticalEfficiency = e.calculateTheoreticalEfficiency()
     metabolicEnergy = e.calculateMetabolicEnergy(weightsByEpoch)
     theoreticalMinimumEnergy = e.calculateTheoreticalMinimumEnergy(
-        weightsByEpoch)
+        weightsByEpoch, epochIndexForConvergence)
     efficiency = e.calculateEfficiency(
         metabolicEnergy, theoreticalMinimumEnergy)
     maintenanceEnergy = e.calculateEnergyFromMaintenance(

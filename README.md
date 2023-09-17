@@ -1,4 +1,4 @@
-This project reproduces and extends upon the results of Li and van Rossum (2020): https://doi.org/10.7554%2FeLife.50804
+This project reproduces and extends upon the results of Li and van Rossum (2020):
 https://elifesciences.org/articles/50804
 
 # PBM-Project1

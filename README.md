@@ -1,3 +1,5 @@
+This project reproduces and extends upon the results of Li and van Rossum (2020): https://elifesciences.org/articles/50804
+
 # PBM-Project1
 
 # Instructions
